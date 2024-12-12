@@ -28,7 +28,9 @@ class NTClientSub(Node):
                 ('sampling_time', 0.1),
                 ('sub_NT_names', [""]),
                 ('msg_types', [""]),
-                ('pub_rostopic_names', [""])]
+                ('pub_rostopic_names', [""]),
+                ('automated', False),
+            ]
         )
 
         # self.glb_sp_wpnts = WpntArray()
@@ -50,9 +52,15 @@ class NTClientSub(Node):
 
         self.inst.setServer(ip)
 
-        self.sub_NT_names = self.get_parameter('sub_NT_names').value
-        self.msg_types = self.get_parameter('msg_types').value
-        self.pub_rostopic_names = self.get_parameter('pub_rostopic_names').value
+        self.sub_NT_names = []
+        self.msg_types = []
+        self.pub_rostopic_names = []
+
+
+        if ~(self.get_parameter('automated').value):
+            self.sub_NT_names = self.get_parameter('sub_NT_names').value
+            self.msg_types = self.get_parameter('msg_types').value
+            self.pub_rostopic_names = self.get_parameter('pub_rostopic_names').value
 
         self.coerceSizeCheck()
         self.get_logger().info('NT Subscribers Enabled!')
@@ -70,15 +78,15 @@ class NTClientSub(Node):
             msg_type = self.msg_types[index]
 
             try:
-                nt_type = nt_type_dict(msg_type.replace(".", "/"))
-                msg = nt2msg(nt_sub.get(), msg_type)
+                nt_type = nt_type_dict(msg_type)
+                msg = nt2msg(nt_sub.get(), msg_type.replace("/", "."))
             except KeyError:
                 nt_type = "String"
                 # deserialize back to ROS message
                 json_msg = nt_sub.get()
                 if json_msg == "":
                     continue
-                msg = json2msg(json_msg, msg_type)
+                msg = json2msg(json_msg, msg_type.replace("/", "."))
             # self.get_logger().info(f'msg #{index}: {msg}')
             
             # publish ROS message
@@ -99,10 +107,7 @@ class NTClientSub(Node):
                 nt_type = "String"
             default_value = nt_default_value(nt_type)
             self.nt_types.append(nt_type)
-
-            msg_type = msg_type.replace("/", ".")
-            self.msg_types[index] = msg_type
-            self.pubs.append(self.create_publisher(findROSClass(msg_type), self.pub_rostopic_names[index], 10))
+            self.pubs.append(self.create_publisher(findROSClass(msg_type.replace("/", ".")), self.pub_rostopic_names[index], 10))
 
             # create nt subscribers
             self.nt_subs.append(nt_create_topic(self.inst, nt_type, nt_name).subscribe(default_value))
