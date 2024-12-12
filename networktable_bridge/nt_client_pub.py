@@ -89,7 +89,7 @@ class NTClientPub(Node):
             msg_type = msg_type.replace("/", ".")
             nt_name = self.pub_NT_names[index]
 
-            nt_type = "String"
+            nt_type = "string"
             self.nt_types.append(nt_type)
 
             self.msg_types[index] = msg_type

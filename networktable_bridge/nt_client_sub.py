@@ -81,7 +81,7 @@ class NTClientSub(Node):
                 nt_type = nt_type_dict(msg_type)
                 msg = nt2msg(nt_sub.get(), msg_type.replace("/", "."))
             except KeyError:
-                nt_type = "String"
+                nt_type = "string"
                 # deserialize back to ROS message
                 json_msg = nt_sub.get()
                 if json_msg == "":
@@ -104,7 +104,7 @@ class NTClientSub(Node):
             try:
                 nt_type = nt_type_dict(msg_type)
             except KeyError:
-                nt_type = "String"
+                nt_type = "string"
             default_value = nt_default_value(nt_type)
             self.nt_types.append(nt_type)
             self.pubs.append(self.create_publisher(findROSClass(msg_type.replace("/", ".")), self.pub_rostopic_names[index], 10))

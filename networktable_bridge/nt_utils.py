@@ -72,14 +72,14 @@ def todict(obj):
     return obj
 
 nt_dict = {
-    "std_msgs/msg/Bool":"Boolean",
-    "std_msgs/msg/Float64MultiArray":"DoubleArray",
-    "std_msgs/msg/Float64":"Double",
-    "std_msgs/msg/Float32MultiArray":"FloatArray",
-    "std_msgs/msg/Float32":"Float",
-    "std_msgs/msg/Int32MultiArray":"IntegerArray",
-    "std_msgs/msg/Int32":"Integer", 
-    "std_msgs/msg/String":"String"
+    "std_msgs/msg/Bool":"boolean",
+    "std_msgs/msg/Float64MultiArray":"double[]",
+    "std_msgs/msg/Float64":"double",
+    "std_msgs/msg/Float32MultiArray":"float[]",
+    "std_msgs/msg/Float32":"float",
+    "std_msgs/msg/Int32MultiArray":"integer[]",
+    "std_msgs/msg/Int32":"integer", 
+    "std_msgs/msg/String":"string"
 }
 
 # ros_dict = dict()
@@ -97,53 +97,53 @@ def nt_create_topic(inst:ntcore.NetworkTableInstance, topic_type:str, topic_name
     table_name = topic_name[:(topic_name.rfind("/"))]
     table = inst.getTable(table_name)
 
-    if topic_type == "BooleanArray":
+    if topic_type == "boolean[]":
         return table.getBooleanArrayTopic(name)
-    elif topic_type == "Boolean":
+    elif topic_type == "boolean":
         return table.getBooleanTopic(name)
 
-    elif topic_type == "DoubleArray":
+    elif topic_type == "double[]":
         return table.getDoubleArrayTopic(name)
-    elif topic_type == "Double":
+    elif topic_type == "double":
         return table.getDoubleTopic(name)
 
-    elif topic_type == "FloatArray":
+    elif topic_type == "float[]":
         return table.getFloatArrayTopic(name)
-    elif topic_type == "Float":
+    elif topic_type == "float":
         return table.getFloatTopic(name)
         
-    elif topic_type == "IntegerArray":
+    elif topic_type == "integer[]":
         return table.getIntegerArrayTopic(name)
-    elif topic_type == "Integer":
+    elif topic_type == "integer":
         return table.getIntegerTopic(name)
     
-    elif topic_type == "StringArray":
+    elif topic_type == "string[]":
         return table.getStringArrayTopic(name)
-    elif topic_type == "String":
+    elif topic_type == "string":
         return table.getStringTopic(name)
 
 def nt_default_value(topic_type:str):
-    if topic_type == "BooleanArray":
+    if topic_type == "boolean[]":
         return [False]
-    elif topic_type == "Boolean":
+    elif topic_type == "boolean":
         return False
 
-    elif topic_type == "DoubleArray":
+    elif topic_type == "double[]":
         return [0.0]
-    elif topic_type == "Double":
+    elif topic_type == "double":
         return 0.0
 
-    elif topic_type == "FloatArray":
+    elif topic_type == "float[]":
         return [0.0]
-    elif topic_type == "Float":
+    elif topic_type == "float":
         return 0.0
         
-    elif topic_type == "IntegerArray":
+    elif topic_type == "integer[]":
         return [0]
-    elif topic_type == "Integer":
+    elif topic_type == "integer":
         return 0
     
-    elif topic_type == "StringArray":
+    elif topic_type == "string[]":
         return [""]
-    elif topic_type == "String":
+    elif topic_type == "string":
         return ""
