@@ -38,6 +38,10 @@ if __name__ == "__main__":
         pub1.set(i)
         pub2.set(i + 100)
         name_pub_.set("Winston")
-
-        time.sleep(0.5)
         i += 1
+
+        try:
+            time.sleep(0.5)
+        except KeyboardInterrupt:
+            print('\nProgram interrupted by user.')
+            break
