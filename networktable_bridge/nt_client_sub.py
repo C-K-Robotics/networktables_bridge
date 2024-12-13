@@ -127,7 +127,8 @@ class NTClientSub(Node):
                 self.get_logger().info(f"Connected to {event.data.remote_id}")
             elif event.is_(ntcore.EventFlags.kDisconnected):
                 self.get_logger().info(f"Disconnected from {event.data.remote_id}")
-                # self.removeDisconnectedPubs()
+                self.emptyDisconnectedPubs()
+                self.removeEmptyEntries()
 
     # add a listener to see when new topics are published
     def _on_pub(self, event: ntcore.Event):
@@ -152,7 +153,8 @@ class NTClientSub(Node):
             except KeyError: # TODO: add support to BooleanArray and StringArray
                 return
             
-            self.get_logger().info(f'newly published: {event.data.name}')
+            registered_index = len(self.nt_subs)
+            self.get_logger().info(f'\nNewly Published #{registered_index}: {event.data.name}')
             rostopic_name = '/networktable' + NT_name.replace(' ','_')
             self.sub_NT_names.append(str(event.data.name))
             self.msg_types.append(ros_type_dict(event.data.type_str))
@@ -161,7 +163,7 @@ class NTClientSub(Node):
     
     def update_pubs(self):
         start_index = len(self.nt_subs)
-        # self.get_logger().info(f'\n\n{start_index}\n')
+        # self.get_logger().info(f'\n\n{start_index}\n') # DEBUG: check the starting index is correct
         for nt_name in self.sub_NT_names[start_index:]:
             index = self.sub_NT_names.index(nt_name)
             msg_type = self.msg_types[index]
@@ -217,28 +219,38 @@ class NTClientSub(Node):
             raise Exception("Topic info has unmatched size!!! Please check you yaml file.")
     
     def removeEmptyEntries(self):
-        for nt_name in self.sub_NT_names:
+        self.get_logger().info(f'\n{len(self.pubs)}') # DEBUG: check # of rostopic_pubs need to be dumped
+        dump_sub_NT_names = self.sub_NT_names.copy()
+        for nt_name in dump_sub_NT_names:
             index = self.sub_NT_names.index(nt_name)
             if nt_name == "":
                 self.sub_NT_names.pop(index)
                 self.msg_types.pop(index)
                 self.pub_rostopic_names.pop(index)
+                try:
+                    self.pubs.pop(index)
+                    self.nt_types.pop(index)
+                    self.nt_subs.pop(index)
+                    self._on_subs.pop(index)
+                    self.valueListenersHandle.pop(index)
+                except IndexError:
+                    time.sleep(0.05)
+        self.get_logger().info(f'\n{len(self.pubs)}') # DEBUG: check # of rostopic_pubs remains
 
-    def removeDisconnectedPubs(self):
-        for nt_name in self.sub_NT_names:
-            # if nt_name not in self.user_defined_sub_NT_names:
-            self.get_logger().info(f'\n{len(self.sub_NT_names)}')
-            index = self.sub_NT_names.index(nt_name)
-            self.sub_NT_names.pop(index)
-            self.msg_types.pop(index)
-            self.pub_rostopic_names.pop(index)
-            self.pubs[index].destroy()
-            self.pubs.pop(index)
-            self.nt_types.pop(index)
-            self.nt_subs.pop(index)
-            self._on_subs.pop(index)
-            self.valueListenersHandle.pop(index)
-            self.get_logger().info(f'\n{len(self.sub_NT_names)}')
+    def emptyDisconnectedPubs(self):
+        original_sub_NT_names = self.sub_NT_names.copy()
+        for nt_name in original_sub_NT_names:
+            if nt_name not in self.user_defined_sub_NT_names:
+                index = self.sub_NT_names.index(nt_name)
+                self.sub_NT_names[index] = ""
+                self.msg_types[index] = ""
+                self.pub_rostopic_names[index] = ""
+                self.destroy_publisher(self.pubs[index])
+                self.nt_types[index] = ""
+                self.nt_subs[index].close()
+                self._on_subs[index] = None
+                self.inst.removeListener(self.valueListenersHandle[index])
+        # self.get_logger().info(f'\n{self.sub_NT_names}')
         
 def main(args=None):
     rclpy.init(args=args)
