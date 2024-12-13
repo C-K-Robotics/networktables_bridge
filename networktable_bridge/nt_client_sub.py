@@ -219,7 +219,7 @@ class NTClientSub(Node):
             raise Exception("Topic info has unmatched size!!! Please check you yaml file.")
     
     def removeEmptyEntries(self):
-        self.get_logger().info(f'\n{len(self.pubs)}') # DEBUG: check # of rostopic_pubs need to be dumped
+        # self.get_logger().info(f'\n{len(self.pubs)}') # DEBUG: check # of rostopic_pubs need to be dumped
         dump_sub_NT_names = self.sub_NT_names.copy()
         for nt_name in dump_sub_NT_names:
             index = self.sub_NT_names.index(nt_name)
@@ -235,7 +235,7 @@ class NTClientSub(Node):
                     self.valueListenersHandle.pop(index)
                 except IndexError:
                     time.sleep(0.05)
-        self.get_logger().info(f'\n{len(self.pubs)}') # DEBUG: check # of rostopic_pubs remains
+        # self.get_logger().info(f'\n{len(self.pubs)}') # DEBUG: check # of rostopic_pubs remains
 
     def emptyDisconnectedPubs(self):
         original_sub_NT_names = self.sub_NT_names.copy()
