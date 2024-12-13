@@ -3,6 +3,7 @@
 import json
 import yaml
 import importlib
+from collections import defaultdict
 
 import numpy as np
 import ntcore
@@ -82,15 +83,15 @@ nt_dict = {
     "std_msgs/msg/String":"string"
 }
 
-# ros_dict = dict()
-# for key, value in nt_dict.items():
-#     ros_dict[value].append(key)         
+ros_dict = {}
+for key, value in nt_dict.items():
+    ros_dict[value] = key
 
 def nt_type_dict(ros_type:str):
     return nt_dict[ros_type]
 
-# def ros_type_dict(nt_type:str):
-#     return ros_dict[nt_type]
+def ros_type_dict(nt_type:str):
+    return ros_dict[nt_type]
 
 def nt_create_topic(inst:ntcore.NetworkTableInstance, topic_type:str, topic_name:str):
     name = topic_name[(topic_name.rfind("/")) + 1:]
