@@ -3,6 +3,7 @@ NT_Client_Subscribe_Node:
     NT_server_ip: "10.80.20.2"
     sampling_time: 0.1
     
-    sub_NT_names: []  # the NT names you want to subscribe, like "/data/test_vel"
-    msg_types: [] # the corresponding ROS msg type, like "geometry_msgs/msg/Twist"
-    pub_rostopic_names: []  # the ROS topic name to be published, like "/restored_cmd_vel"
+    sub_NT_names: ['/data/1']  # the NT names you want to subscribe, like "/data/test_vel"
+    msg_types: ['std_msgs/msg/Float64'] # the corresponding ROS msg type, like "geometry_msgs/msg/Twist"
+    pub_rostopic_names: ['/data/test_1']  # the ROS topic name to be published, like "/restored_cmd_vel"
+    automated: True # Default: True
