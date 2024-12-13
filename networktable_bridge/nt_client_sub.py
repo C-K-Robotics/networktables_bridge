@@ -245,11 +245,11 @@ class NTClientSub(Node):
                 self.sub_NT_names[index] = ""
                 self.msg_types[index] = ""
                 self.pub_rostopic_names[index] = ""
-                self.destroy_publisher(self.pubs[index])
                 self.nt_types[index] = ""
                 self.nt_subs[index].close()
                 self._on_subs[index] = None
                 self.inst.removeListener(self.valueListenersHandle[index])
+                self.destroy_publisher(self.pubs[index])
         # self.get_logger().info(f'\n{self.sub_NT_names}')
         
 def main(args=None):
