@@ -3,6 +3,6 @@ NT_Client_Publish_Node:
     NT_server_ip: "10.80.20.2"
     sampling_time: 0.1
     
-    sub_rostopic_names: []  # the ROS topics you want to subscribe, like "/test_cmd_vel", "/test/test_pose"
-    msg_types: [] # the corresponding ROS msg type, like "geometry_msgs/msg/Twist", "geometry_msgs/msg/Pose"
-    pub_NT_names: []  # the NetworkTable name to be published to NT, like "/data/test_vel","/data/data/test_pose"
+    sub_rostopic_names: [""]  # the ROS topics you want to subscribe, like "/test_cmd_vel", "/test/test_pose"
+    msg_types: [""] # the corresponding ROS msg type, like "geometry_msgs/msg/Twist", "geometry_msgs/msg/Pose"
+    pub_NT_names: [""]  # the NetworkTable name to be published to NT, like "/data/test_vel","/data/data/test_pose"
