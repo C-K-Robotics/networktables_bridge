@@ -15,8 +15,8 @@
   <depend>geometry_msgs</depend>
 
   <depend>robotpy</depend>
-  <depend>importlib</depend>
-  <depend>netifaces</depend>
+  <depend>python3-importlib-resources</depend>
+  <depend>python3-netifaces</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
