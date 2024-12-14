@@ -47,5 +47,9 @@ qtcreator-*
 # Emacs
 .#*
 
-# Catkin custom files
+# Catkin/Colcon custom files
 CATKIN_IGNORE
+COLCON_IGNORE
+
+# Networktables persistent files
+*networktables.json
