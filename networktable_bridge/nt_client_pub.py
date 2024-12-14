@@ -82,7 +82,7 @@ class NTClientPub(Node):
         self.subs = []
         self.nt_types = []
         self.nt_pubs = []
-        self.functions = []
+        self._msg_cbs = []
         for rostopic_name in self.sub_rostopic_names:
             index = self.sub_rostopic_names.index(rostopic_name)
             msg_type = self.msg_types[index]
@@ -93,20 +93,20 @@ class NTClientPub(Node):
             self.nt_types.append(nt_type)
 
             self.msg_types[index] = msg_type
-            self.functions.append(self.create_a_function(index))
+            self._msg_cbs.append(self.make_func_msg_cb(index))
             self.get_logger().info(f'Function #{index} Created!')
             var_class = findROSClass(msg_type)
             self.msgs.append(var_class())
-            self.subs.append(self.create_subscription(var_class, rostopic_name, self.functions[index], 10))
+            self.subs.append(self.create_subscription(var_class, rostopic_name, self._msg_cbs[index], 10))
             
             # create nt publishers
             self.nt_pubs.append(nt_create_topic(self.inst, nt_type, nt_name).publish())
 
-    def create_a_function(self, index):
-        def msg_cb(msg):
+    def make_func_msg_cb(self, index):
+        def _msg_cb(msg):
             self.msgs[index] = msg
             # self.get_logger().info(f'msg #{index}: {self.msgs[index]}')
-        return msg_cb
+        return _msg_cb
 
     def coerceSizeCheck(self):
         if len(self.sub_rostopic_names) == len(self.msg_types):
