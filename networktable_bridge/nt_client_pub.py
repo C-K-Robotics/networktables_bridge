@@ -49,11 +49,21 @@ class NTClientPub(Node):
         self.inst.startClient4(identity)
 
         self.inst.setServer(ip)
+        
+        self.sub_rostopic_names = []
+        self.msg_types = []
+        self.pub_NT_names = []
+        self.subs = []
+        self.nt_types = []
+        self.nt_pubs = []
+        self._msg_cbs = []
+        self.msgs = []
 
-        self.sub_rostopic_names = self.get_parameter('sub_rostopic_names').value
-        self.msg_types = self.get_parameter('msg_types').value
-        self.pub_NT_names = self.get_parameter('pub_NT_names').value
+        self.sub_rostopic_names.extend(self.get_parameter('sub_rostopic_names').value)
+        self.msg_types.extend(self.get_parameter('msg_types').value)
+        self.pub_NT_names.extend(self.get_parameter('pub_NT_names').value)
 
+        self.removeEmptyEntries()
         self.coerceSizeCheck()
         self.get_logger().info('NT Publishers Enabled!')
 
@@ -78,11 +88,6 @@ class NTClientPub(Node):
             # self.get_logger().info(f'Publish msg #{index} to NetworkTable!')
 
     def create_subs(self):
-        self.msgs = []
-        self.subs = []
-        self.nt_types = []
-        self.nt_pubs = []
-        self._msg_cbs = []
         for rostopic_name in self.sub_rostopic_names:
             index = self.sub_rostopic_names.index(rostopic_name)
             msg_type = self.msg_types[index]
@@ -117,6 +122,22 @@ class NTClientPub(Node):
         else:
             raise Exception("Topic info has unmatched size!!! Please check you yaml file.")
         
+    def removeEmptyEntries(self):
+        dump_sub_rostopic_names = self.sub_rostopic_names.copy()
+        for rostopic_name in dump_sub_rostopic_names:
+            index = self.sub_rostopic_names.index(rostopic_name)
+            if rostopic_name == "":
+                self.sub_rostopic_names.pop(index)
+                self.msg_types.pop(index)
+                self.pub_NT_names.pop(index)
+                try:
+                    self.subs.pop(index)
+                    self.nt_types.pop(index)
+                    self.nt_pubs.pop(index)
+                    self._msg_cbs.pop(index)
+                    self.msgs.pop(index)
+                except IndexError:
+                    time.sleep(0.05)
         
 def main(args=None):
     rclpy.init(args=args)
