@@ -1,8 +1,8 @@
-# networktable_bridge
+# networktables_bridge
 
 ## Overview
 
-The `networktable_bridge` package is designed to establish an interface between the FRC NetworkTables (specifically NT4, with potential support for NT3). It facilitates communication by subscribing to NetworkTable topics and publishing them to ROS 2 topics under the `/networktable` namespace. Additionally, it can subscribe to ROS 2 topics and publish them to NetworkTable topics without a specific prefix, allowing for complete customization.
+The `networktables_bridge` package is designed to establish an interface between the FRC NetworkTables (specifically NT4, with potential support for NT3). It facilitates communication by subscribing to NetworkTable topics and publishing them to ROS 2 topics under the `/networktable` namespace. Additionally, it can subscribe to ROS 2 topics and publish them to NetworkTable topics without a specific prefix, allowing for complete customization.
 
 ## Features
 
@@ -28,7 +28,7 @@ The `networktable_bridge` package is designed to establish an interface between 
 Python versions supported: 3.8, 3.9, 3.10, 3.11, and 3.12 (only version available for roboRIO).
 
 ### ROS Compatibility
-The `networktable_bridge` package is compatible with the following ROS distributions:
+The `networktables_bridge` package is compatible with the following ROS distributions:
 - **ROS 2 Humble**: Recommended for new  projects running on Ubuntu 22.04.
 - **ROS 2 Iron**: Supported for users requiring newer features introduced in Iron.
 - **ROS 2 Foxy**: Compatible with Ubuntu 20.04; however, note that support for Foxy ended in May 2023.
@@ -37,7 +37,7 @@ The `networktable_bridge` package is compatible with the following ROS distribut
 ### Steps to Install
 1. Clone the repository into your workspace's src directory:
 ```bash
-git clone <repository-url> {workspace}/src/networktable_bridge
+git clone <repository-url> {workspace}/src/networktables_bridge
 ```
 2. Specify the NT server IP address in the YAML files:
    - For `nt_client_pub_node`, edit `nt_client_pub.yaml`:
@@ -72,12 +72,12 @@ source install/setup.bash
 4. Execution:
     - To run an individual node:
         ```bash
-        ros2 run networktable_bridge nt_client_pub_node --ros-args --params-file nt_client_pub.yaml
-        ros2 run networktable_bridge nt_client_sub_node --ros-args --params-file nt_client_sub.yaml
+        ros2 run networktables_bridge nt_client_pub_node --ros-args --params-file nt_client_pub.yaml
+        ros2 run networktables_bridge nt_client_sub_node --ros-args --params-file nt_client_sub.yaml
         ```
     - Use a launch file if you need both nodes running simultaneously:
         ```bash
-        ros2 launch networktable_bridge nt_client.launch.py
+        ros2 launch networktables_bridge nt_client.launch.py
         ```
 
 ## License
