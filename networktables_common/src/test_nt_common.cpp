@@ -33,24 +33,28 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
   //   std::bind(&GPSWaypointFollowerNode::ackermann_callback, this, std::placeholders::_1)
   // );
 
-  // Publisher for odometry
+  // ROS2 Publishers
   // odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("gps_odom", rclcpp::QoS(10));
+  data_1_pub_ = this->create_publisher<std_msgs::msg::Float64>("/data/num_1", rclcpp::QoS(10));
+  data_2_pub_ = this->create_publisher<std_msgs::msg::Float64>("/data/num_2", rclcpp::QoS(10));
+  my_name_pub_ = this->create_publisher<std_msgs::msg::String>("/data/my_name", rclcpp::QoS(10));
 
-  inst_ = nt::NetworkTableInstance::GetDefault();
-  inst_.StartClient4("test_nt_common_client");
-  inst_.SetServer("127.0.0.1");
-
-  pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_1_, "/data/1");
-  pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_2_, "/data/2");
-  pubsub::subscribe_from<StringTopic, TestNTCommonNode>(
-    this, inst_, string_topic_subscriber_, "/data/my name", &TestNTCommonNode::on_string_topic_received);
-
+  // RCLCPP Timers
+  step_timer_20_hz_ =
+    rclcpp::create_timer(
+    this, get_clock(), std::chrono::duration<float>(0.05), [this] {
+      step_20_hz();
+    });
   step_timer_100_hz_ =
     rclcpp::create_timer(
     this, get_clock(), std::chrono::duration<float>(0.01), [this] {
       step_100_hz();
     });
-  
+
+  // NetworkTablesInstance Setup
+  inst_ = nt::NetworkTableInstance::GetDefault();
+  inst_.StartClient4("test_nt_common_client");
+  inst_.SetServer("127.0.0.1");
   conn_listener_handle_ = inst_.AddConnectionListener(
     true, [this] (const nt::Event& event) {
       if (event.Is(nt::EventFlags::kConnected)) {
@@ -60,6 +64,12 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
       }
     }
   );
+
+  // Subscribers via NetworkTables Common PubSub
+  pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_1_, "/data/1");
+  pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_2_, "/data/2");
+  pubsub::subscribe_from<StringTopic, TestNTCommonNode>(
+    this, inst_, string_topic_subscriber_, "/data/my name", &TestNTCommonNode::on_string_topic_received);
 }
 
 // void TestNTCommonNode::ackermann_callback(const ackermann_msgs::msg::AckermannDriveStamped::SharedPtr msg)
@@ -67,6 +77,34 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
 //   // Implementation of the callback function
 //   this->ackermann_cmd_ = *msg;
 // }
+
+void TestNTCommonNode::step_20_hz()
+{
+  // Publish some test data to ROS2 topics
+  if (double_topic_subscriber_1_->has_msg())
+  {
+    const auto& msg1 = double_topic_subscriber_1_->last_received_msg();
+    auto msg1_ros = std_msgs::msg::Float64();
+    msg1_ros.data = *msg1;
+    data_1_pub_->publish(msg1_ros);
+  }
+
+  if (double_topic_subscriber_2_->has_msg())
+  {
+    const auto& msg2 = double_topic_subscriber_2_->last_received_msg();
+    auto msg2_ros = std_msgs::msg::Float64();
+    msg2_ros.data = *msg2;
+    data_2_pub_->publish(msg2_ros);
+  }
+
+  if (string_topic_subscriber_->has_msg())
+  {
+    const auto& name_msg = string_topic_subscriber_->last_received_msg();
+    auto name_msg_ros = std_msgs::msg::String();
+    name_msg_ros.data = *name_msg;
+    my_name_pub_->publish(name_msg_ros);
+  }
+}
 
 void TestNTCommonNode::step_100_hz()
 {
