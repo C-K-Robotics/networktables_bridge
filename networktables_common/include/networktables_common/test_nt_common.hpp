@@ -44,9 +44,7 @@ private:
 
   void step_20_hz();
   void step_100_hz();
-  void on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg) {
-    RCLCPP_INFO(this->get_logger(), "Yo! I received: %s", msg->c_str());
-  }
+  void on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg);
 };
 
 }  // namespace nt

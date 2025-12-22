@@ -96,14 +96,6 @@ void TestNTCommonNode::step_20_hz()
     msg2_ros.data = *msg2;
     data_2_pub_->publish(msg2_ros);
   }
-
-  if (string_topic_subscriber_->has_msg())
-  {
-    const auto& name_msg = string_topic_subscriber_->last_received_msg();
-    auto name_msg_ros = std_msgs::msg::String();
-    name_msg_ros.data = *name_msg;
-    my_name_pub_->publish(name_msg_ros);
-  }
 }
 
 void TestNTCommonNode::step_100_hz()
@@ -114,6 +106,14 @@ void TestNTCommonNode::step_100_hz()
     const auto& msg3 = string_topic_subscriber_->last_received_msg();
     RCLCPP_INFO(this->get_logger(), "Received messages (1, 2, my name): (%f, %f, %s)", *msg1, *msg2, msg3->c_str());
   }
+}
+
+void TestNTCommonNode::on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg) {
+  RCLCPP_INFO(this->get_logger(), "Yo! I received: %s", msg->c_str());
+  const auto& name_msg = string_topic_subscriber_->last_received_msg();
+  auto name_msg_ros = std_msgs::msg::String();
+  name_msg_ros.data = *name_msg;
+  my_name_pub_->publish(name_msg_ros);
 }
 
 }  // namespace nt
