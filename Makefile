@@ -59,4 +59,7 @@ session:
 .PHONY: join-session
 join-session:
 	@CONT_NAME="${CONT_NAME}"
-	docker exec -it ${CONT_NAME} /bin/bash
+	if [ "${CONT_NAME}" == "" ]; then
+		CONT_NAME="test_container"
+	fi
+	docker exec -it $${CONT_NAME} /bin/bash
