@@ -25,9 +25,7 @@ public:
     inst_.RemoveListener(conn_listener_handle_);
   }
 
-private:
-  void step_100_hz();
-  
+private:  
   // Subscribers and publishers
   rclcpp::TimerBase::SharedPtr step_timer_100_hz_;
 
@@ -35,8 +33,13 @@ private:
   NT_Listener conn_listener_handle_;
 
   std::unique_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_1_;
-  std::unique_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_2_;
-  std::unique_ptr<pubsub::TopicSubscriber<StringTopic>> string_topic_subscriber_;
+  std::shared_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_2_;
+  std::shared_ptr<pubsub::TopicSubscriber<StringTopic, TestNTCommonNode>> string_topic_subscriber_;
+
+  void step_100_hz();
+  void on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg) {
+    RCLCPP_INFO(this->get_logger(), "Yo! I received: %s", msg->c_str());
+  }
 };
 
 }  // namespace nt

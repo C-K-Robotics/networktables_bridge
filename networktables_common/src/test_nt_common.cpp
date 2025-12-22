@@ -42,7 +42,8 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
 
   pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_1_, "/data/1");
   pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_2_, "/data/2");
-  pubsub::subscribe_from<StringTopic>(this, inst_, string_topic_subscriber_, "/data/my name");
+  pubsub::subscribe_from<StringTopic, TestNTCommonNode>(
+    this, inst_, string_topic_subscriber_, "/data/my name", &TestNTCommonNode::on_string_topic_received);
 
   step_timer_100_hz_ =
     rclcpp::create_timer(
