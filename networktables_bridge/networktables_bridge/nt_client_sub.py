@@ -155,7 +155,7 @@ class NTClientSub(Node):
             
             registered_index = len(self.nt_subs)
             self.get_logger().info(f'\nNewly Published #{registered_index}: {event.data.name}')
-            rostopic_name = '/networktable' + NT_name.replace(' ','_')
+            rostopic_name = '/networktables' + NT_name.replace(' ','_')
             self.sub_NT_names.append(str(event.data.name))
             self.msg_types.append(ros_type_dict(event.data.type_str))
             self.pub_rostopic_names.append(rostopic_name)

@@ -10,7 +10,7 @@ from launch_ros.actions import PushRosNamespace
 
 
 def generate_launch_description():
-    pkg_name = 'networktable_bridge'
+    pkg_name = 'networktables_bridge'
         
     pub_node=Node(
         executable='nt_client_pub_node',

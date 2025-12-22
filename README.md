@@ -2,12 +2,12 @@
 
 ## Overview
 
-The `networktables_bridge` package is designed to establish an interface between the FRC NetworkTables (specifically NT4, with potential support for NT3). It facilitates communication by subscribing to NetworkTable topics and publishing them to ROS 2 topics under the `/networktable` namespace. Additionally, it can subscribe to ROS 2 topics and publish them to NetworkTable topics without a specific prefix, allowing for complete customization.
+The `networktables_bridge` package is designed to establish an interface between the FRC NetworkTables (specifically NT4, with potential support for NT3). It facilitates communication by subscribing to NetworkTables topics and publishing them to ROS 2 topics under the `/networktables` namespace. Additionally, it can subscribe to ROS 2 topics and publish them to NetworkTables topics without a specific prefix, allowing for complete customization.
 
 ## Features
 
-- **NetworkTable to ROS 2:** Automatically or manually subscribe to NetworkTable topics and publish them as ROS 2 topics with a prefix namespace `/networktable`.
-- **ROS 2 to NetworkTable:** Subscribe to ROS 2 topics and publish them to NetworkTable topics with customizable settings, avoiding unnecessary bandwidth consumption.
+- **NetworkTables to ROS 2:** Automatically or manually subscribe to NetworkTables topics and publish them as ROS 2 topics with a prefix namespace `/networktables`.
+- **ROS 2 to NetworkTables:** Subscribe to ROS 2 topics and publish them to NetworkTables topics with customizable settings, avoiding unnecessary bandwidth consumption.
 
 ## Installation
 

@@ -2,7 +2,7 @@ from setuptools import setup
 import os
 from glob import glob
 
-package_name = 'networktable_bridge'
+package_name = 'networktables_bridge'
 
 setup(
     name=package_name,
@@ -24,8 +24,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'nt_client_pub_node = networktable_bridge.nt_client_pub:main',
-            'nt_client_sub_node = networktable_bridge.nt_client_sub:main',
+            'nt_client_pub_node = networktables_bridge.nt_client_pub:main',
+            'nt_client_sub_node = networktables_bridge.nt_client_sub:main',
         ],
     },
 )

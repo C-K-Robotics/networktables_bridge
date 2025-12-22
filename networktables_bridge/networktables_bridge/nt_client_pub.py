@@ -83,9 +83,9 @@ class NTClientPub(Node):
             json_msg, msg_type = msg2json(msg)
             # self.get_logger().info(f'Serialize msg #{index}!')
 
-            # publish to NetworkTable
+            # publish to NetworkTables
             nt_pub.set(json_msg)
-            # self.get_logger().info(f'Publish msg #{index} to NetworkTable!')
+            # self.get_logger().info(f'Publish msg #{index} to NetworkTables!')
 
     def create_subs(self):
         for rostopic_name in self.sub_rostopic_names:

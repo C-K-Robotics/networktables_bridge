@@ -5,4 +5,4 @@ NT_Client_Publish_Node:
     
     sub_rostopic_names: [""]  # the ROS topics you want to subscribe, like "/test_cmd_vel", "/test/test_pose"
     msg_types: [""] # the corresponding ROS msg type, like "geometry_msgs/msg/Twist", "geometry_msgs/msg/Pose"
-    pub_NT_names: [""]  # the NetworkTable name to be published to NT, like "/data/test_vel","/data/data/test_pose"
+    pub_NT_names: [""]  # the NetworkTables name to be published to NT, like "/data/test_vel","/data/data/test_pose"
