@@ -29,7 +29,7 @@ if __name__ == "__main__":
     table = inst.getTable("data")
     pub1 = table.getDoubleTopic("1").publish()
     pub2 = table.getDoubleTopic("2").publish()
-    name_pub_ = table.getStringTopic("my name").publish()
+    name_pub_ = table.getStringTopic("my_name").publish()
 
     i = 3
 

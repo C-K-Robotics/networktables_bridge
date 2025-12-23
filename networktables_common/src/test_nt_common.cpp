@@ -9,32 +9,13 @@ namespace nt
 TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
 : Node("test_nt_common_node", options)
 {
-  // Declare parameters
-  // this->declare_parameter<double>("gps_publish_s", 0.05);
-
-  // dt_gps_ = this->get_parameter("gps_publish_s").as_double();
-  // this->debug_ = this->get_parameter("debug").as_bool();
-
-  // auto qos = rclcpp::QoS(10)
-  //   .best_effort()
-  //   .durability_volatile()
-  //   .lifespan(std::chrono::nanoseconds::max())
-  //   .deadline(std::chrono::nanoseconds::max())
-  //   .liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC)
-  //   .liveliness_lease_duration(std::chrono::nanoseconds::max());
-
-  // gps_subscriber_ = this->create_subscription<gps_msgs::msg::GPSFix>(
-  //   "raw_gps", qos,
-  //   std::bind(&GPSWaypointFollowerNode::gps_callback, this, std::placeholders::_1)
-  // );
-
-  // ackermann_sub_ = this->create_subscription<ackermann_msgs::msg::AckermannDriveStamped>(
-  //   "ackermann_cmd", rclcpp::QoS(10),
-  //   std::bind(&GPSWaypointFollowerNode::ackermann_callback, this, std::placeholders::_1)
-  // );
-
-  // ROS2 Publishers
-  // odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("gps_odom", rclcpp::QoS(10));
+  // ROS2 Subscribers & Publishers
+  data_1_copy_sub_ = this->create_subscription<std_msgs::msg::Float64>(
+    "/data/num_1", rclcpp::QoS(10), std::bind(&TestNTCommonNode::on_data_1_copy_received, this, std::placeholders::_1)
+  );
+  my_name_copy_sub_ = this->create_subscription<std_msgs::msg::String>(
+    "/data/my_name", rclcpp::QoS(10), std::bind(&TestNTCommonNode::on_my_name_copy_received, this, std::placeholders::_1)
+  );
   data_1_pub_ = this->create_publisher<std_msgs::msg::Float64>("/data/num_1", rclcpp::QoS(10));
   data_2_pub_ = this->create_publisher<std_msgs::msg::Float64>("/data/num_2", rclcpp::QoS(10));
   my_name_pub_ = this->create_publisher<std_msgs::msg::String>("/data/my_name", rclcpp::QoS(10));
@@ -65,18 +46,32 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
     }
   );
 
-  // Subscribers via NetworkTables Common PubSub
+  // Subscribers & Publishers via NetworkTables Common PubSub
   pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_1_, "/data/1");
   pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_2_, "/data/2", pubsub::kSensorPubSubOptions);
   pubsub::subscribe_from<StringTopic, TestNTCommonNode>(
-    this, inst_, string_topic_subscriber_, "/data/my name", &TestNTCommonNode::on_string_topic_received);
+    this, inst_, string_topic_subscriber_, "/data/my_name", &TestNTCommonNode::on_string_topic_received);
+  pubsub::publish_to<DoubleTopic>(this, inst_, double_topic_publisher_1_, "/data/1_copy");
+  pubsub::publish_to<StringTopic>(this, inst_, string_topic_publisher_, "/data/my_name_copy");
 }
 
-// void TestNTCommonNode::ackermann_callback(const ackermann_msgs::msg::AckermannDriveStamped::SharedPtr msg)
-// {
-//   // Implementation of the callback function
-//   this->ackermann_cmd_ = *msg;
-// }
+void TestNTCommonNode::on_data_1_copy_received(const std_msgs::msg::Float64::SharedPtr msg)
+{
+  if (msg == nullptr) {
+    RCLCPP_WARN(this->get_logger(), "Received null message on /data/num_1");
+    return;
+  }
+  double_topic_publisher_1_->publish(std::make_unique<DoubleTopic::ValueType>(msg->data));
+}
+
+void TestNTCommonNode::on_my_name_copy_received(const std_msgs::msg::String::SharedPtr msg)
+{
+  if (msg == nullptr) {
+    RCLCPP_WARN(this->get_logger(), "Received null message on /data/my_name");
+    return;
+  }
+  string_topic_publisher_->publish(msg->data);
+}
 
 void TestNTCommonNode::step_20_hz()
 {
@@ -103,7 +98,8 @@ void TestNTCommonNode::step_100_hz()
   auto msg1 = double_topic_subscriber_1_->last_received_msg();
   auto msg2 = double_topic_subscriber_2_->last_received_msg();
   auto msg3 = string_topic_subscriber_->last_received_msg();
-  if (msg1 && msg2 && msg3) {
+  if (msg1 && msg2 && msg3)
+  {
     RCLCPP_INFO(this->get_logger(), "Received messages (1, 2, my name): (%f, %f, %s)", *msg1, *msg2, msg3->c_str());
   }
 }
