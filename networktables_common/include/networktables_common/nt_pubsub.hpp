@@ -167,6 +167,7 @@ public:
 
   bool has_seen_msg()
   {
+    std::scoped_lock lock{mutex_};
     return has_seen_msg_;
   }
 
