@@ -23,7 +23,6 @@ public:
   explicit TestNTCommonNode(const rclcpp::NodeOptions & options);
 
   ~TestNTCommonNode() {
-    inst_ = nt::NetworkTableInstance::GetDefault();
     inst_.RemoveListener(conn_listener_handle_);
   }
 

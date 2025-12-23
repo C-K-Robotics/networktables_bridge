@@ -41,7 +41,7 @@ if __name__ == "__main__":
         i += 1
 
         try:
-            time.sleep(0.5)
+            time.sleep(0.01)
         except KeyboardInterrupt:
             print('\nProgram interrupted by user.')
             break

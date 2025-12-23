@@ -33,6 +33,10 @@ namespace nt
 namespace pubsub
 {
 
+constexpr PubSubOptions kSensorPubSubOptions = PubSubOptions{
+  .periodic = 0.02,  // 50 Hz
+};
+
 // Declare non-templated functions
 void split_topic_name(
   const std::string& topic_name,
@@ -67,7 +71,6 @@ public:
       subscription_,
       nt::EventFlags::kValueAll,
       [this] (const nt::Event&) {
-        std::scoped_lock lock{mutex_};
         auto msg = std::make_shared<typename TopicT::ValueType>(subscription_.Get());
         on_msg_received(msg);
       }
@@ -88,7 +91,6 @@ public:
       subscription_,
       nt::EventFlags::kValueAll,
       [this, callback] (const nt::Event&) {
-        std::scoped_lock lock{mutex_};
         auto msg = std::make_shared<typename TopicT::ValueType>(subscription_.Get());
         on_msg_received(msg);
         (parent_->*callback)(msg);
@@ -97,12 +99,12 @@ public:
   }
 
   ~TopicSubscriber() {
-    inst_ = nt::NetworkTableInstance::GetDefault();
     inst_.RemoveListener(value_listener_handle_);
   }
 
   std::shared_ptr<typename TopicT::ValueType> take()
   {
+    std::scoped_lock lock{mutex_};
     auto msg = last_received_msg_;
     last_received_msg_ = nullptr;
     return msg;
@@ -115,6 +117,7 @@ public:
 
   bool has_msg()
   {
+    std::scoped_lock lock{mutex_};
     return last_received_msg_ != nullptr;
   }
 
@@ -125,6 +128,7 @@ public:
 
   [[nodiscard]] std::shared_ptr<typename TopicT::ValueType> last_received_msg() const
   {
+    std::scoped_lock lock{mutex_};
     return last_received_msg_;
   }
 
@@ -137,11 +141,12 @@ private:
   std::shared_ptr<typename TopicT::ValueType> last_received_msg_;
   typename TopicT::SubscriberType subscription_;
 
-  std::mutex mutex_;  // use a mutex to make updating the value and flag thread-safe
+  mutable std::mutex mutex_;  // use a mutex to make updating the value and flag thread-safe
   NT_Listener value_listener_handle_;
 
   void on_msg_received(const std::shared_ptr<typename TopicT::ValueType> msg)
   {
+    std::scoped_lock lock{mutex_};
     has_seen_msg_ = true;
     last_received_msg_ = msg;
     latest_msg_time_ = parent_->now();

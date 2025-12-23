@@ -67,7 +67,7 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
 
   // Subscribers via NetworkTables Common PubSub
   pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_1_, "/data/1");
-  pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_2_, "/data/2");
+  pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_2_, "/data/2", pubsub::kSensorPubSubOptions);
   pubsub::subscribe_from<StringTopic, TestNTCommonNode>(
     this, inst_, string_topic_subscriber_, "/data/my name", &TestNTCommonNode::on_string_topic_received);
 }
@@ -100,10 +100,10 @@ void TestNTCommonNode::step_20_hz()
 
 void TestNTCommonNode::step_100_hz()
 {
-  if (double_topic_subscriber_1_->has_msg() && double_topic_subscriber_2_->has_msg() && string_topic_subscriber_->has_msg()) {
-    const auto& msg1 = double_topic_subscriber_1_->last_received_msg();
-    const auto& msg2 = double_topic_subscriber_2_->last_received_msg();
-    const auto& msg3 = string_topic_subscriber_->last_received_msg();
+  auto msg1 = double_topic_subscriber_1_->last_received_msg();
+  auto msg2 = double_topic_subscriber_2_->last_received_msg();
+  auto msg3 = string_topic_subscriber_->last_received_msg();
+  if (msg1 && msg2 && msg3) {
     RCLCPP_INFO(this->get_logger(), "Received messages (1, 2, my name): (%f, %f, %s)", *msg1, *msg2, msg3->c_str());
   }
 }
