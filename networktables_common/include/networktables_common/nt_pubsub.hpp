@@ -54,7 +54,7 @@ public:
   {
     parent_ = parent;
     inst_ = inst;
-    latest_msg_time_ = rclcpp::Time(0, 0, RCL_CLOCK_UNINITIALIZED);
+    latest_msg_time_ = nt::Now();
 
     std::string name;
     std::string table_name;
@@ -74,10 +74,10 @@ public:
   {
     if (!is_activated()) return;
     publisher_.Set(msg);
-    latest_msg_time_ = parent_->now();
+    latest_msg_time_ = nt::Now();
   }
 
-  rclcpp::Time latest_msg_time()
+  int64_t latest_msg_time()
   {
     return latest_msg_time_;
   }
@@ -99,7 +99,7 @@ public:
 
 private:
   std::atomic<bool> activated_ = false;
-  rclcpp::Time latest_msg_time_;
+  int64_t latest_msg_time_;
   ClassT * parent_;
 
   nt::NetworkTableInstance inst_;
@@ -119,7 +119,7 @@ public:
   {
     parent_ = parent;
     inst_ = inst;
-    latest_msg_time_ = rclcpp::Time(0, 0, RCL_CLOCK_UNINITIALIZED);
+    latest_msg_time_ = nt::Now();
 
     std::string name;
     std::string table_name;
@@ -183,7 +183,7 @@ public:
     return last_received_msg_ != nullptr;
   }
 
-  rclcpp::Time latest_msg_time()
+  int64_t latest_msg_time()
   {
     return latest_msg_time_;
   }
@@ -196,7 +196,7 @@ public:
 
 private:
   bool has_seen_msg_{};
-  rclcpp::Time latest_msg_time_;
+  int64_t latest_msg_time_;
   ClassT * parent_;
 
   nt::NetworkTableInstance inst_;
@@ -211,7 +211,7 @@ private:
     std::scoped_lock lock{mutex_};
     has_seen_msg_ = true;
     last_received_msg_ = msg;
-    latest_msg_time_ = parent_->now();
+    latest_msg_time_ = nt::Now();
   }
 
   // TODO(Winston): Implement default message generation if needed
