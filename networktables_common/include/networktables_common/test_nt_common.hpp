@@ -37,9 +37,9 @@ private:
   nt::NetworkTableInstance inst_;
   NT_Listener conn_listener_handle_;
 
-  std::unique_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_1_;
-  std::shared_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_2_;
-  std::shared_ptr<pubsub::TopicSubscriber<StringTopic, TestNTCommonNode>> string_topic_subscriber_;
+  pubsub::TopicSubscriber<DoubleTopic>::UniquePtr double_topic_subscriber_1_;
+  pubsub::TopicSubscriber<DoubleTopic>::SharedPtr double_topic_subscriber_2_;
+  pubsub::TopicSubscriber<StringTopic, TestNTCommonNode>::SharedPtr string_topic_subscriber_;
 
   void step_20_hz();
   void step_100_hz();
