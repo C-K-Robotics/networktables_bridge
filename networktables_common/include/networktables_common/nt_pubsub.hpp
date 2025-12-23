@@ -23,9 +23,6 @@
 #include <networktables/StructArrayTopic.h>
 #include <networktables/StructTopic.h>
 
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp_lifecycle/lifecycle_node.hpp"
-
 namespace nt
 {
 
@@ -42,17 +39,15 @@ void split_topic_name(
   std::string& table_name,
   std::string& name);
 
-template<typename TopicT, typename ClassT = rclcpp::Node>
+template<typename TopicT>
 class TopicPublisher
 {
 public:
   TopicPublisher(
-    ClassT * const parent,
     nt::NetworkTableInstance & inst,
     std::string const & topic_name,
     PubSubOptions const & options = kDefaultPubSubOptions)
   {
-    parent_ = parent;
     inst_ = inst;
     latest_msg_time_ = nt::Now();
 
@@ -100,24 +95,21 @@ public:
 private:
   std::atomic<bool> activated_ = false;
   int64_t latest_msg_time_;
-  ClassT * parent_;
 
   nt::NetworkTableInstance inst_;
   typename TopicT::PublisherType publisher_;
 };
 
-template<typename TopicT, typename ClassT = rclcpp::Node>
+template<typename TopicT>
 class TopicSubscriber
 {
 public:
   TopicSubscriber(
-    ClassT * const parent,
     nt::NetworkTableInstance & inst,
     std::string const & topic_name,
     PubSubOptions const & options = kDefaultPubSubOptions,
     typename TopicT::ValueType const & default_msg = typename TopicT::ValueType{})
   {
-    parent_ = parent;
     inst_ = inst;
     latest_msg_time_ = nt::Now();
 
@@ -138,23 +130,24 @@ public:
     );
   }
 
+  template<typename ClassT>
   TopicSubscriber(
-    ClassT * const parent,
     nt::NetworkTableInstance & inst,
     std::string const & topic_name,
+    ClassT * const this_ptr,
     void (ClassT::* callback)(const std::shared_ptr<typename TopicT::ValueType>),
     PubSubOptions const & options = kDefaultPubSubOptions,
     typename TopicT::ValueType const & default_msg = typename TopicT::ValueType{})
-    : TopicSubscriber(parent, inst, topic_name, options, default_msg)
+    : TopicSubscriber(inst, topic_name, options, default_msg)
   {
     inst_.RemoveListener(value_listener_handle_);
     value_listener_handle_ = inst_.AddListener(
       subscription_,
       nt::EventFlags::kValueAll,
-      [this, callback] (const nt::Event&) {
+      [this, this_ptr, callback] (const nt::Event&) {
         auto msg = std::make_shared<typename TopicT::ValueType>(subscription_.Get());
         on_msg_received(msg);
-        (parent_->*callback)(msg);
+        (this_ptr->*callback)(msg);
       }
     );
   }
@@ -197,7 +190,6 @@ public:
 private:
   bool has_seen_msg_{};
   int64_t latest_msg_time_;
-  ClassT * parent_;
 
   nt::NetworkTableInstance inst_;
   std::shared_ptr<typename TopicT::ValueType> last_received_msg_;
@@ -219,25 +211,16 @@ private:
 
 template<class TopicT>
 void publish_to(
-  rclcpp::Node * this_ptr,
   nt::NetworkTableInstance & inst,
   typename std::shared_ptr<TopicPublisher<TopicT>> & publisher,
   const std::string & topic_name,
+  const bool & activate = false,
   const PubSubOptions & options = kDefaultPubSubOptions)
 {
-  publisher = std::make_shared<TopicPublisher<TopicT>>(this_ptr, inst, topic_name, options);
-  publisher->on_activate();
-}
-
-template<class TopicT>
-void publish_to(
-  rclcpp_lifecycle::LifecycleNode * this_ptr,
-  nt::NetworkTableInstance & inst,
-  typename std::shared_ptr<TopicPublisher<TopicT>> & publisher,
-  const std::string & topic_name,
-  const PubSubOptions & options = kDefaultPubSubOptions)
-{
-  publisher = std::make_shared<TopicPublisher<TopicT>>(this_ptr, inst, topic_name, options);
+  publisher = std::make_shared<TopicPublisher<TopicT>>(inst, topic_name, options);
+  if (activate) {
+    publisher->on_activate();
+  }
 }
 
 template<class TopicT>
@@ -256,7 +239,6 @@ void deactivate_publisher(
 
 template<class TopicT>
 void subscribe_from(
-  rclcpp::Node * const parent,
   nt::NetworkTableInstance & inst,
   typename std::unique_ptr<TopicSubscriber<TopicT>> & subscriber,
   const std::string & topic_name,
@@ -264,27 +246,12 @@ void subscribe_from(
   typename TopicT::ValueType const & default_msg = typename TopicT::ValueType{})
 {
   subscriber = std::make_unique<TopicSubscriber<TopicT>>(
-    parent, inst, topic_name, options, default_msg
+    inst, topic_name, options, default_msg
   );
 }
 
 template<class TopicT>
 void subscribe_from(
-  rclcpp_lifecycle::LifecycleNode * const parent,
-  nt::NetworkTableInstance & inst,
-  typename std::unique_ptr<TopicSubscriber<TopicT, rclcpp_lifecycle::LifecycleNode>> & subscriber,
-  const std::string & topic_name,
-  const PubSubOptions & options = kDefaultPubSubOptions,
-  typename TopicT::ValueType const & default_msg = typename TopicT::ValueType{})
-{
-  subscriber = std::make_unique<TopicSubscriber<TopicT, rclcpp_lifecycle::LifecycleNode>>(
-    parent, inst, topic_name, options, default_msg
-  );
-}
-
-template<class TopicT>
-void subscribe_from(
-  rclcpp::Node * const parent,
   nt::NetworkTableInstance & inst,
   typename std::shared_ptr<TopicSubscriber<TopicT>> & subscriber,
   const std::string & topic_name,
@@ -292,22 +259,22 @@ void subscribe_from(
   typename TopicT::ValueType const & default_msg = typename TopicT::ValueType{})
 {
   subscriber = std::make_shared<TopicSubscriber<TopicT>>(
-    parent, inst, topic_name, options, default_msg
+    inst, topic_name, options, default_msg
   );
 }
 
 template<class TopicT, class ClassT>
 void subscribe_from(
-  ClassT * this_ptr,
   nt::NetworkTableInstance & inst,
-  typename std::shared_ptr<TopicSubscriber<TopicT, ClassT>> & subscriber,
+  typename std::shared_ptr<TopicSubscriber<TopicT>> & subscriber,
   const std::string & topic_name,
+  ClassT * this_ptr,
   void (ClassT::* callback)(const std::shared_ptr<typename TopicT::ValueType>),
   const PubSubOptions & options = kDefaultPubSubOptions,
   typename TopicT::ValueType const & default_msg = typename TopicT::ValueType{})
 {
-  subscriber = std::make_shared<TopicSubscriber<TopicT, ClassT>>(
-    this_ptr, inst, topic_name, callback, options, default_msg
+  subscriber = std::make_shared<TopicSubscriber<TopicT>>(
+    inst, topic_name, this_ptr, callback, options, default_msg
   );
 }
 

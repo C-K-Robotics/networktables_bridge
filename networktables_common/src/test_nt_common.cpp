@@ -47,12 +47,12 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
   );
 
   // Subscribers & Publishers via NetworkTables Common PubSub
-  pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_1_, "/data/1");
-  pubsub::subscribe_from<DoubleTopic>(this, inst_, double_topic_subscriber_2_, "/data/2", pubsub::kSensorPubSubOptions);
+  pubsub::subscribe_from<DoubleTopic>(inst_, double_topic_subscriber_1_, "/data/1");
+  pubsub::subscribe_from<DoubleTopic>(inst_, double_topic_subscriber_2_, "/data/2", pubsub::kSensorPubSubOptions);
   pubsub::subscribe_from<StringTopic, TestNTCommonNode>(
-    this, inst_, string_topic_subscriber_, "/data/my_name", &TestNTCommonNode::on_string_topic_received);
-  pubsub::publish_to<DoubleTopic>(this, inst_, double_topic_publisher_1_, "/data/1_copy");
-  pubsub::publish_to<StringTopic>(this, inst_, string_topic_publisher_, "/data/my_name_copy");
+    inst_, string_topic_subscriber_, "/data/my_name", this, &TestNTCommonNode::on_string_topic_received);
+  pubsub::publish_to<DoubleTopic>(inst_, double_topic_publisher_1_, "/data/1_copy");
+  pubsub::publish_to<StringTopic>(inst_, string_topic_publisher_, "/data/my_name_copy");
 }
 
 void TestNTCommonNode::on_data_1_copy_received(const std_msgs::msg::Float64::SharedPtr msg)

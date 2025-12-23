@@ -41,7 +41,7 @@ private:
 
   std::unique_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_1_;
   std::shared_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_2_;
-  std::shared_ptr<pubsub::TopicSubscriber<StringTopic, TestNTCommonNode>> string_topic_subscriber_;
+  std::shared_ptr<pubsub::TopicSubscriber<StringTopic>> string_topic_subscriber_;
   std::shared_ptr<pubsub::TopicPublisher<DoubleTopic>> double_topic_publisher_1_;
   std::shared_ptr<pubsub::TopicPublisher<StringTopic>> string_topic_publisher_;
 
