@@ -45,6 +45,7 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
       }
     }
   );
+  // nt::SetNow(this->get_clock()->now().nanoseconds()); // Sync local NT time with ROS2 time
 
   // Subscribers & Publishers via NetworkTables Common PubSub
   pubsub::subscribe_from<DoubleTopic>(inst_, double_topic_subscriber_1_, "/data/1");
@@ -75,6 +76,7 @@ void TestNTCommonNode::on_my_name_copy_received(const std_msgs::msg::String::Sha
 
 void TestNTCommonNode::step_20_hz()
 {
+  // nt::SetNow(this->get_clock()->now().nanoseconds()); // Sync local NT time with ROS2 time
   // Publish some test data to ROS2 topics
   if (double_topic_subscriber_1_->has_msg())
   {
@@ -100,7 +102,12 @@ void TestNTCommonNode::step_100_hz()
   auto msg3 = string_topic_subscriber_->last_received_msg();
   if (msg1 && msg2 && msg3)
   {
-    RCLCPP_INFO(this->get_logger(), "Received messages (1, 2, my name): (%f, %f, %s)", *msg1, *msg2, msg3->c_str());
+    RCLCPP_INFO(
+      this->get_logger(),
+      "Received messages (1, 2, my name): (%f, %f, %s)\n"
+      "Time Sync (ROS2 - NT): %ld",
+      *msg1, *msg2, msg3->c_str(), this->get_clock()->now().nanoseconds() - static_cast<int64_t>(nt::Now()*1e3)
+    );
   }
 }
 
