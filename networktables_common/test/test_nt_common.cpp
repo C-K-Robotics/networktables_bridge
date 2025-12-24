@@ -1,6 +1,6 @@
 // Copyright (c) 2025 C.K. Robotics
 
-#include "networktables_common/test_nt_common.hpp"
+#include "test_nt_common.hpp"
 
 
 namespace nt

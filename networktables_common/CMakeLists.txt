@@ -28,7 +28,7 @@ set(${PROJECT_NAME}_HEADER
 )
 
 set(${PROJECT_NAME}_SRC
-  src/test_nt_common.cpp
+  src/nt_common_placeholder.cpp
 )
 
 # Create this project as a library.
@@ -37,19 +37,20 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_SRC}
 )
 
-set(${PROJECT_NAME}_test_nt_common_node_SRC
-  src/test_nt_common.cpp
-)
-
-ament_auto_add_executable(test_nt_common_node
-  ${${PROJECT_NAME}_test_nt_common_node_SRC}
-)
-
 # Explicitly link wpilib's ntcore dependencies
 target_link_libraries(${PROJECT_NAME} ntcore wpinet wpiutil wpimath)
 
 # Create this project as a Python library.
 ament_python_install_package(${PROJECT_NAME})
+
+# Create test executable.
+set(${PROJECT_NAME}_test_nt_common_node_SRC
+  test/test_nt_common.cpp
+)
+
+ament_auto_add_executable(test_nt_common_node
+  ${${PROJECT_NAME}_test_nt_common_node_SRC}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
