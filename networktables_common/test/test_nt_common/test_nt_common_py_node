@@ -43,7 +43,6 @@ class TestNTCommonNode(Node):
     self.double_topic_subscriber_1 = ntpubsub.TopicSubscriber(nt.DoubleTopic, self.inst, "/data/1")
     self.double_topic_subscriber_2 = ntpubsub.TopicSubscriber(nt.DoubleTopic, self.inst, "/data/2", options=ntpubsub.kSensorPubSubOptions)
     self.string_topic_subscriber = ntpubsub.TopicSubscriber(nt.StringTopic, self.inst, "/data/my_name", self.on_string_topic_received)
-    # ntpubsub.subscribe_from(nt.DoubleTopic, self.inst, self.double_topic_subscriber_1, "/data/1")
     self.double_topic_publisher_1 = ntpubsub.TopicPublisher(nt.DoubleTopic, self.inst, "/data/1_copy")
     self.string_topic_publisher = ntpubsub.TopicPublisher(nt.StringTopic, self.inst, "/data/my_name_copy")
     self.double_topic_publisher_1.on_activate()

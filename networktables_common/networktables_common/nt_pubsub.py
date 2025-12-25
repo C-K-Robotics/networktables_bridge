@@ -118,25 +118,8 @@ class TopicSubscriber:
   def latest_received_msg(self):
     return self.__last_received_msg
 
-def publish_to(TopicT, inst: nt.NetworkTableInstance,
-               publisher: TopicPublisher,
-               topic_name: str,
-               activate: bool = False,
-               options: nt.PubSubOptions = kDefaultPubSubOptions):
-  publisher = TopicPublisher(TopicT, inst, topic_name, options)
-  if activate:
-    publisher.on_activate()
-
 def activate_publisher(publisher: TopicPublisher):
   publisher.on_activate()
 
 def deactivate_publisher(publisher: TopicPublisher):
   publisher.on_deactivate()
-
-def subscribe_from(TopicT, inst: nt.NetworkTableInstance,
-                   subscriber: TopicSubscriber,
-                   topic_name: str,
-                   callback = None,
-                   options: nt.PubSubOptions = kDefaultPubSubOptions,
-                   default_msg = None):
-  subscriber = TopicSubscriber(TopicT, inst, topic_name, callback, options, default_msg)
