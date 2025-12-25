@@ -54,6 +54,8 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
     inst_, string_topic_subscriber_, "/data/my_name", this, &TestNTCommonNode::on_string_topic_received);
   pubsub::publish_to<DoubleTopic>(inst_, double_topic_publisher_1_, "/data/1_copy");
   pubsub::publish_to<StringTopic>(inst_, string_topic_publisher_, "/data/my_name_copy");
+  double_topic_publisher_1_->on_activate();
+  string_topic_publisher_->on_activate();
 }
 
 void TestNTCommonNode::on_data_1_copy_received(const std_msgs::msg::Float64::SharedPtr msg)
