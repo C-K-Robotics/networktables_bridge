@@ -60,6 +60,10 @@ ament_auto_add_executable(test_nt_common_node
   ${${PROJECT_NAME}_test_nt_common_node_SRC}
 )
 
+install(PROGRAMS test/test_nt_common/test_nt_common_py_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   set(ament_cmake_copyright_FOUND TRUE)

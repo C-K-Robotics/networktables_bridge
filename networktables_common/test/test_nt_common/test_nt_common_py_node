@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+
+import os
+from os.path import basename
+
+import ntcore as nt
+import networktables_common.nt_pubsub as ntpubsub
+import numpy as np
+
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String, Float64
+
+
+def is_invalid_char(char):
+  """Define what constitutes an invalid character for a ROS topic name."""
+  return char in "!@#$%^&*()~{,}-=+<>:"
+
+
+class TestNTCommonNode(Node):
+  def __init__(self):
+    super().__init__('test_nt_common_py_node', allow_undeclared_parameters=True)
+
+    # ROS2 Subscribers & Publishers
+    self.data_1_copy_sub = self.create_subscription(Float64, '/data/num_1', self.on_data_1_copy_received, 10)
+    self.my_name_copy_sub = self.create_subscription(String, '/data/my_name', self.on_my_name_copy_received, 10)
+    self.data_1_pub = self.create_publisher(Float64, '/data/num_1', 10)
+    self.data_2_pub = self.create_publisher(Float64, '/data/num_2', 10)
+    self.my_name_pub = self.create_publisher(String, '/data/my_name', 10)
+
+    # RCLPY Timers
+    self.step_timer_20_hz = self.create_timer(0.05, self.step_20_hz)  # 20 Hz
+    self.step_timer_100_hz = self.create_timer(0.01, self.step_100_hz)  # 100 Hz
+
+    # NetworkTablesInstance Setup
+    self.inst = nt.NetworkTableInstance.getDefault()
+    identity = f"{basename(__file__)}-{os.getpid()}"
+    self.inst.startClient4(identity)
+    self.inst.setServer("127.0.0.1")
+    self.connListenerHandle = self.inst.addConnectionListener(True, self.__connect_cb)
+
+    # Subscribers & Publishers via NetworkTables Common PubSub
+    self.double_topic_subscriber_1 = ntpubsub.TopicSubscriber(nt.DoubleTopic, self.inst, "/data/1")
+    self.double_topic_subscriber_2 = ntpubsub.TopicSubscriber(nt.DoubleTopic, self.inst, "/data/2", options=ntpubsub.kSensorPubSubOptions)
+    self.string_topic_subscriber = ntpubsub.TopicSubscriber(nt.StringTopic, self.inst, "/data/my_name", self.on_string_topic_received)
+    # ntpubsub.subscribe_from(nt.DoubleTopic, self.inst, self.double_topic_subscriber_1, "/data/1")
+    self.double_topic_publisher_1 = ntpubsub.TopicPublisher(nt.DoubleTopic, self.inst, "/data/1_copy")
+    self.string_topic_publisher = ntpubsub.TopicPublisher(nt.StringTopic, self.inst, "/data/my_name_copy")
+    self.double_topic_publisher_1.on_activate()
+    self.string_topic_publisher.on_activate()
+
+  def __connect_cb(self, event: nt.Event):
+    if event.is_(nt.EventFlags.kConnected):
+      self.get_logger().info(f"Connected to {event.data.remote_id}")
+    elif event.is_(nt.EventFlags.kDisconnected):
+      self.get_logger().info(f"Disconnected from {event.data.remote_id}")
+
+  def on_data_1_copy_received(self, msg: Float64):
+    if msg is None:
+      self.get_logger().warn("Received null message on /data/num_1")
+      return
+    self.double_topic_publisher_1.publish(msg.data)
+
+  def on_my_name_copy_received(self, msg: String):
+    if msg is None:
+      self.get_logger().warn("Received null message on /data/my_name")
+      return
+    self.string_topic_publisher.publish(msg.data)
+
+  def step_20_hz(self):
+    # Publish some test data to ROS2 topics
+    if self.double_topic_subscriber_1.has_msg():
+      msg1 = self.double_topic_subscriber_1.latest_received_msg()
+      msg1_ros = Float64()
+      msg1_ros.data = msg1
+      self.data_1_pub.publish(msg1_ros)
+
+    if self.double_topic_subscriber_2.has_msg():
+      msg2 = self.double_topic_subscriber_2.latest_received_msg()
+      msg2_ros = Float64()
+      msg2_ros.data = msg2
+      self.data_2_pub.publish(msg2_ros)
+
+  def step_100_hz(self):
+    msg1 = self.double_topic_subscriber_1.latest_received_msg()
+    msg2 = self.double_topic_subscriber_2.latest_received_msg()
+    msg3 = self.string_topic_subscriber.latest_received_msg()
+    if msg1 and msg2 and msg3:
+      self.get_logger().info(
+        f"Received messages (1, 2, my name): ({msg1}, {msg2}, {msg3})\n"
+        f"Time Sync (ROS2 - NT): {self.get_clock().now().nanoseconds - int(nt._now()*1e3)}"
+      )
+
+  def on_string_topic_received(self, msg: str):
+    self.get_logger().info(f"Yo! I received: {msg}")
+    name_msg_ros = String()
+    name_msg_ros.data = msg
+    self.my_name_pub.publish(name_msg_ros)
+      
+        
+def main(args=None):
+  rclpy.init(args=args)
+  node = TestNTCommonNode()
+
+  try:
+    rclpy.spin(node)
+  except KeyboardInterrupt:
+    pass
+
+  # Destroy the node explicitly
+  # (optional - otherwise it will be done automatically
+  # when the garbage collector destroys the node object)
+  node.destroy_node()
+  rclpy.shutdown()
+
+if __name__ == "__main__":
+  main()
