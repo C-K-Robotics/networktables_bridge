@@ -21,7 +21,9 @@ setup(
     maintainer_email='wisnton.h.chou@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
-    tests_require=['pytest'],
+    extras_require={
+        "test": ["pytest"],
+    },
     entry_points={
         'console_scripts': [
             'nt_client_pub_node = networktables_bridge.nt_client_pub:main',
