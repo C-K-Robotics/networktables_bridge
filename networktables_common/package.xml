@@ -2,8 +2,8 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>networktables_common</name>
-  <version>0.0.0</version>
-  <description>TBD</description>
+  <version>0.1.0</version>
+  <description>NetworkTables common utilities and interfaces for ROS 2 integration.</description>
   <maintainer email="winston.h.chou@gmail.com">Winston Chou</maintainer>
   <license>LGPLv3</license>
   <author email="winston.h.chou@gmail.com">Winston Chou</author>
@@ -22,7 +22,6 @@
   <depend>wpiutil</depend>
   <depend>wpimath</depend>
 
-  <depend>frc_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
