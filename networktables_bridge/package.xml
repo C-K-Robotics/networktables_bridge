@@ -2,28 +2,37 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>networktables_bridge</name>
-  <version>0.1.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="winston.h.chou@gmail.com">root</maintainer>
-  <license>TODO: License declaration</license>
+  <version>0.2.0</version>
+  <description>The package is designed to establish an interface between the FRC NetworkTables (specifically NT4, with potential support for NT3). It facilitates communication by subscribing to NetworkTables topics and publishing them to ROS 2 topics. Additionally, it can subscribe to ROS 2 topics and publish them to NetworkTables topics, allowing for complete customization.</description>
+  <maintainer email="winston.h.chou@gmail.com">Winston Chou</maintainer>
+  <license>LGPLv3</license>
+  <author email="winston.h.chou@gmail.com">Winston Chou</author>
 
-  <depend>rclpy</depend>
-  <depend>tf2_ros_py</depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
 
-  <depend>python3-numpy</depend>
-  <depend>std_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+  <depend>lifecycle_msgs</depend>
+
+  <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>frc_msgs</depend>
+  <depend>networktables_common</depend>
 
-  <depend>robotpy</depend>
-  <depend>python3-importlib-resources</depend>
-  <depend>python3-netifaces</depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
 
-  <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
 
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
   <export>
-    <build_type>ament_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

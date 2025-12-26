@@ -16,6 +16,7 @@
   <depend>rclpy</depend>
   <depend>boost</depend>
 
+  <depend>robotpy</depend>
   <depend>wpilib</depend>
   <depend>ntcore</depend>
   <depend>wpinet</depend>

@@ -24,6 +24,7 @@ ament_auto_find_build_dependencies(REQUIRED
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MiscReport.msg"
+  "msg/NTClient.msg"
 
   DEPENDENCIES
     builtin_interfaces

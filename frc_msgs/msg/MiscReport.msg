@@ -11,3 +11,4 @@ float32 amps_6v_system
 float32 rio_cpu_temp
 float32 rio_canbus_utilization
 bool sys_active
+NTClient[] nt_clients
