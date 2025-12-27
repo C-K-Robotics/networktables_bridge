@@ -31,6 +31,18 @@ public:
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_configure(const rclcpp_lifecycle::State &);
 
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+  on_activate(const rclcpp_lifecycle::State & state);
+
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+  on_deactivate(const rclcpp_lifecycle::State & state);
+
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+  on_cleanup(const rclcpp_lifecycle::State &);
+
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+  on_shutdown(const rclcpp_lifecycle::State & state);
+
 private:  
   // Subscribers and publishers
   rclcpp::TimerBase::SharedPtr step_timer_50_hz_;
@@ -39,11 +51,10 @@ private:
   nt::NetworkTableInstance inst_;
   NT_Listener conn_listener_handle_;
 
-  // std::vector<std::shared_ptr<pubsub::TopicSubscriber>> system_stats_subscribers_;
+  std::shared_ptr<pubsub::MultiTopicSubscriber> sys_stats_subscriber_;
+  std::shared_ptr<pubsub::MultiTopicSubscriber> nt_clients_subscriber_;
 
   void step_50_hz();
-  // void on_data_1_copy_received(const std_msgs::msg::Float64::SharedPtr msg);
-  // void on_my_name_copy_received(const std_msgs::msg::String::SharedPtr msg);
   // void on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg);
 };
 

@@ -1,7 +1,7 @@
 // Copyright (c) 2025 C.K. Robotics
 
 #include "networktables_bridge/nt_bridge.hpp"
-
+#include "rcutils/logging_macros.h"
 
 namespace nt
 {
@@ -42,69 +42,87 @@ NTBridgeNode::on_configure(const rclcpp_lifecycle::State &)
   // nt::SetNow(this->get_clock()->now().nanoseconds()); // Sync local NT time with ROS2 time
 
   // Subscribers & Publishers via NetworkTables Common PubSub
-  // pubsub::subscribe_from<DoubleTopic>(inst_, double_topic_subscriber_1_, "/data/1");
-  // pubsub::subscribe_from<DoubleTopic>(inst_, double_topic_subscriber_2_, "/data/2", pubsub::kSensorPubSubOptions);
-  // pubsub::subscribe_from<StringTopic, NTBridgeNode>(
-  //   inst_, string_topic_subscriber_, "/data/my_name", this, &NTBridgeNode::on_string_topic_received);
-  // double_topic_publisher_1_->on_activate();
-  // string_topic_publisher_->on_activate();
-  // RCLCPP_INFO(get_logger(), "on_configure() is called.");
+  pubsub::subscribe_from(inst_, sys_stats_subscriber_, {{"/SystemStats/"}});
+  pubsub::subscribe_from(inst_, nt_clients_subscriber_, {{"/SystemStats/NTClients/"}});
+  RCLCPP_INFO(get_logger(), "on_configure() is called.");
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-// void NTBridgeNode::on_data_1_copy_received(const std_msgs::msg::Float64::SharedPtr msg)
-// {
-//   if (msg == nullptr) {
-//     RCLCPP_WARN(this->get_logger(), "Received null message on /data/num_1");
-//     return;
-//   }
-//   double_topic_publisher_1_->publish(std::make_unique<DoubleTopic::ValueType>(msg->data));
-// }
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+NTBridgeNode::on_activate(const rclcpp_lifecycle::State & state)
+{
+  LifecycleNode::on_activate(state);
+  RCUTILS_LOG_INFO_NAMED(get_name(), "on_activate() is called.");
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
 
-// void NTBridgeNode::on_my_name_copy_received(const std_msgs::msg::String::SharedPtr msg)
-// {
-//   if (msg == nullptr) {
-//     RCLCPP_WARN(this->get_logger(), "Received null message on /data/my_name");
-//     return;
-//   }
-//   string_topic_publisher_->publish(msg->data);
-// }
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+NTBridgeNode::on_deactivate(const rclcpp_lifecycle::State & state)
+{
+  LifecycleNode::on_deactivate(state);
+  RCUTILS_LOG_INFO_NAMED(get_name(), "on_deactivate() is called.");
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
 
-// void NTBridgeNode::step_20_hz()
-// {
-//   // nt::SetNow(this->get_clock()->now().nanoseconds()); // Sync local NT time with ROS2 time
-//   // Publish some test data to ROS2 topics
-//   if (double_topic_subscriber_1_->has_msg())
-//   {
-//     const auto& msg1 = double_topic_subscriber_1_->last_received_msg();
-//     auto msg1_ros = std_msgs::msg::Float64();
-//     msg1_ros.data = *msg1;
-//     data_1_pub_->publish(msg1_ros);
-//   }
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+NTBridgeNode::on_cleanup(const rclcpp_lifecycle::State &)
+{
+  step_timer_50_hz_.reset();
+  misc_report_pub_.reset();
+  RCUTILS_LOG_INFO_NAMED(get_name(), "on cleanup is called.");
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
 
-//   if (double_topic_subscriber_2_->has_msg())
-//   {
-//     const auto& msg2 = double_topic_subscriber_2_->last_received_msg();
-//     auto msg2_ros = std_msgs::msg::Float64();
-//     msg2_ros.data = *msg2;
-//     data_2_pub_->publish(msg2_ros);
-//   }
-// }
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+NTBridgeNode::on_shutdown(const rclcpp_lifecycle::State & state)
+{
+  LifecycleNode::on_shutdown(state);
+  step_timer_50_hz_.reset();
+  misc_report_pub_.reset();
+
+  RCUTILS_LOG_INFO_NAMED(
+    get_name(),
+    "on shutdown is called from state %s.",
+    state.label().c_str());
+
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
 
 void NTBridgeNode::step_50_hz()
 {
-  // auto msg1 = double_topic_subscriber_1_->last_received_msg();
-  // auto msg2 = double_topic_subscriber_2_->last_received_msg();
-  // auto msg3 = string_topic_subscriber_->last_received_msg();
-  // if (msg1 && msg2 && msg3)
-  // {
-  //   RCLCPP_INFO(
-  //     this->get_logger(),
-  //     "Received messages (1, 2, my name): (%f, %f, %s)\n"
-  //     "Time Sync (ROS2 - NT): %ld",
-  //     *msg1, *msg2, msg3->c_str(), this->get_clock()->now().nanoseconds() - static_cast<int64_t>(nt::Now()*1e3)
-  //   );
-  // }
+  auto team_num_msg = static_cast<int64_t*>(sys_stats_subscriber_->last_received_msg("/SystemStats/TeamNumber"));
+  auto bv_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/BatteryVoltage"));
+  auto bc_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/BatteryCurrent"));
+  auto v3v3_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/3v3Rail/Voltage"));
+  auto c3v3_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/3v3Rail/Current"));
+  auto v5v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/5vRail/Voltage"));
+  auto c5v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/5vRail/Current"));
+  auto v6v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/6vRail/Voltage"));
+  auto c6v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/6vRail/Current"));
+  auto cpu_temp_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/CPUTempCelsius"));
+  auto canbus_util_msg = static_cast<float*>(sys_stats_subscriber_->last_received_msg("/SystemStats/CANBus/Utilization"));
+  auto sys_active_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/SystemStats/SystemActive"));
+  auto rsl_state_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/SystemStats/RSLState"));
+  auto sys_time_valid_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/SystemStats/SystemTimeValid"));
+
+  auto misc_report_msg = frc_msgs::msg::MiscReport();
+  misc_report_msg.stamp = this->get_clock()->now();
+  if (team_num_msg) misc_report_msg.team_number = static_cast<uint16_t>(*team_num_msg);
+  if (bv_msg) misc_report_msg.battery_voltage = static_cast<float>(*bv_msg);
+  if (bc_msg) misc_report_msg.battery_current = static_cast<float>(*bc_msg);
+  if (v3v3_msg) misc_report_msg.voltage_3v3_system = static_cast<float>(*v3v3_msg);
+  if (c3v3_msg) misc_report_msg.amps_3v3_system = static_cast<float>(*c3v3_msg);
+  if (v5v_msg) misc_report_msg.voltage_5v_system = static_cast<float>(*v5v_msg);
+  if (c5v_msg) misc_report_msg.amps_5v_system = static_cast<float>(*c5v_msg);
+  if (v6v_msg) misc_report_msg.voltage_6v_system = static_cast<float>(*v6v_msg);
+  if (c6v_msg) misc_report_msg.amps_6v_system = static_cast<float>(*c6v_msg);
+  if (cpu_temp_msg) misc_report_msg.rio_cpu_temp = static_cast<float>(*cpu_temp_msg);
+  if (canbus_util_msg) misc_report_msg.rio_canbus_utilization = *canbus_util_msg;
+  if (sys_active_msg) misc_report_msg.sys_active = *sys_active_msg;
+  if (rsl_state_msg) misc_report_msg.rsl_state = *rsl_state_msg;
+  if (sys_time_valid_msg) misc_report_msg.sys_time_valid = *sys_time_valid_msg;
+  misc_report_pub_->publish(misc_report_msg);
 }
 
 // void NTBridgeNode::on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg) {
@@ -121,9 +139,9 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::executors::SingleThreadedExecutor exe;
-  exe.add_node(
-    std::make_shared<nt::NTBridgeNode>(
-      "nt_bridge_node", rclcpp::NodeOptions())->get_node_base_interface());
+  auto node =
+    std::make_shared<nt::NTBridgeNode>("nt_bridge_node", rclcpp::NodeOptions());
+  exe.add_node(node->get_node_base_interface());
   exe.spin();
   rclcpp::shutdown();
   return 0;
