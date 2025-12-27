@@ -122,6 +122,23 @@ void NTBridgeNode::step_50_hz()
   if (sys_active_msg) misc_report_msg.sys_active = *sys_active_msg;
   if (rsl_state_msg) misc_report_msg.rsl_state = *rsl_state_msg;
   if (sys_time_valid_msg) misc_report_msg.sys_time_valid = *sys_time_valid_msg;
+
+  // TODO(Winston): must get info from NT Server (a.k.a. rio)
+  // below doesnt work since we are client only
+  // for (const auto& conn : nt::NetworkTableInstance::GetDefault().GetConnections()) {
+  //   auto client_msg = frc_msgs::msg::NTClient();
+  //   client_msg.stamp = this->get_clock()->now();
+  //   client_msg.remote_id = conn.remote_id;
+  //   auto connected_msg = static_cast<bool*>(
+  //     nt_clients_subscriber_->last_received_msg(
+  //       "/SystemStats/NTClients/" + conn.remote_id + "/Connected"));
+  //   if (connected_msg) client_msg.connected = static_cast<bool>(*connected_msg);
+  //   client_msg.ip_address = conn.remote_ip;
+  //   client_msg.protocol_version = conn.protocol_version;
+  //   client_msg.remote_port = conn.remote_port;
+  //   misc_report_msg.nt_clients.push_back(client_msg);
+  // }
+
   misc_report_pub_->publish(misc_report_msg);
 }
 
