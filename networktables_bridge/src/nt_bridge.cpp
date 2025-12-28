@@ -131,7 +131,7 @@ void NTBridgeNode::step_50_hz()
   auto map = nt_clients_subscriber_->last_received_msgs();
   std::smatch match;
   for (const auto& [key, ptr] : map) {
-    if (std::regex_match(key, match, re)) continue;
+    if (!std::regex_match(key, match, re)) continue;
 
     std::string client_name = match[1].str();
     frc_msgs::msg::NTClient client_msg;

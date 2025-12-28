@@ -36,22 +36,6 @@ if __name__ == "__main__":
     double_array_pub = table.getDoubleArrayTopic("array/double_array").publish()
     string_array_pub = table.getStringArrayTopic("array/string_array").publish()
 
-    sys_table = inst.getTable("AdvantageKit/SystemStats")
-    team_number_pub = sys_table.getIntegerTopic("TeamNumber").publish()
-    bat_voltage_pub = sys_table.getDoubleTopic("BatteryVoltage").publish()
-    bat_current_pub = sys_table.getDoubleTopic("BatteryCurrent").publish()
-    v3v3_pub = sys_table.getDoubleTopic("3v3Rail/Voltage").publish()
-    c3v3_pub = sys_table.getDoubleTopic("3v3Rail/Current").publish()
-    v5v_pub = sys_table.getDoubleTopic("5vRail/Voltage").publish()
-    c5v_pub = sys_table.getDoubleTopic("5vRail/Current").publish()
-    v6v_pub = sys_table.getDoubleTopic("6vRail/Voltage").publish()
-    c6v_pub = sys_table.getDoubleTopic("6vRail/Current").publish()
-    cpu_temp_pub = sys_table.getDoubleTopic("CPUTempCelsius").publish()
-    canbus_util_pub = sys_table.getFloatTopic("CANBus/Utilization").publish()
-    sys_active_pub = sys_table.getBooleanTopic("SystemActive").publish()
-    rsl_state_pub = sys_table.getBooleanTopic("RSLState").publish()
-    sys_time_valid_pub = sys_table.getBooleanTopic("SystemTimeValid").publish()
-
     i = 3
 
     while True:
@@ -64,22 +48,6 @@ if __name__ == "__main__":
         double_array_pub.set([random(), random(), random(), random(), random(), random()])
         possible_strings = ["alpha", "bravo", "charlie", "delta", "echo"]
         string_array_pub.set([choice(possible_strings), choice(possible_strings), choice(possible_strings)])
-
-        # Example system stats
-        team_number_pub.set(8020)  # Example team number
-        bat_voltage_pub.set(12.5 + 0.5*random())  # Example battery voltage
-        bat_current_pub.set(0.2 + 3.0*random())   # Example battery current
-        v3v3_pub.set(3.3 + 0.1*random())          # Example 3.3V rail voltage
-        c3v3_pub.set(0.1 + 1.0*random())          # Example 3.3V rail current
-        v5v_pub.set(5.0 + 0.1*random())           # Example 5V rail voltage
-        c5v_pub.set(0.2 + 2.0*random())           # Example 5V rail current
-        v6v_pub.set(6.0 + 0.1*random())           # Example 6V rail voltage
-        c6v_pub.set(0.3 + 3.0*random())           # Example 6V rail current
-        cpu_temp_pub.set(40.0 + 10.0*random())    # Example CPU temperature
-        canbus_util_pub.set(0.5 + 0.5*random())   # Example CAN bus utilization
-        sys_active_pub.set(True)   # Example system active status
-        rsl_state_pub.set(i%2 == 0)    # Example RSL state
-        sys_time_valid_pub.set(True)  # Example system time valid status
 
         i += 1
 
