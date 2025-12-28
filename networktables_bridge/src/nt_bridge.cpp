@@ -42,8 +42,8 @@ NTBridgeNode::on_configure(const rclcpp_lifecycle::State &)
   // nt::SetNow(this->get_clock()->now().nanoseconds()); // Sync local NT time with ROS2 time
 
   // Subscribers & Publishers via NetworkTables Common PubSub
-  pubsub::subscribe_from(inst_, sys_stats_subscriber_, {{"/SystemStats/"}});
-  pubsub::subscribe_from(inst_, nt_clients_subscriber_, {{"/SystemStats/NTClients/"}});
+  pubsub::subscribe_from(inst_, sys_stats_subscriber_, {{"/AdvantageKit/SystemStats/"}});
+  pubsub::subscribe_from(inst_, nt_clients_subscriber_, {{"/AdvantageKit/SystemStats/NTClients/"}});
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -91,20 +91,20 @@ NTBridgeNode::on_shutdown(const rclcpp_lifecycle::State & state)
 
 void NTBridgeNode::step_50_hz()
 {
-  auto team_num_msg = static_cast<int64_t*>(sys_stats_subscriber_->last_received_msg("/SystemStats/TeamNumber"));
-  auto bv_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/BatteryVoltage"));
-  auto bc_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/BatteryCurrent"));
-  auto v3v3_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/3v3Rail/Voltage"));
-  auto c3v3_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/3v3Rail/Current"));
-  auto v5v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/5vRail/Voltage"));
-  auto c5v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/5vRail/Current"));
-  auto v6v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/6vRail/Voltage"));
-  auto c6v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/6vRail/Current"));
-  auto cpu_temp_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/SystemStats/CPUTempCelsius"));
-  auto canbus_util_msg = static_cast<float*>(sys_stats_subscriber_->last_received_msg("/SystemStats/CANBus/Utilization"));
-  auto sys_active_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/SystemStats/SystemActive"));
-  auto rsl_state_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/SystemStats/RSLState"));
-  auto sys_time_valid_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/SystemStats/SystemTimeValid"));
+  auto team_num_msg = static_cast<int64_t*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/TeamNumber"));
+  auto bv_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/BatteryVoltage"));
+  auto bc_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/BatteryCurrent"));
+  auto v3v3_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/3v3Rail/Voltage"));
+  auto c3v3_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/3v3Rail/Current"));
+  auto v5v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/5vRail/Voltage"));
+  auto c5v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/5vRail/Current"));
+  auto v6v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/6vRail/Voltage"));
+  auto c6v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/6vRail/Current"));
+  auto cpu_temp_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/CPUTempCelsius"));
+  auto canbus_util_msg = static_cast<float*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/CANBus/Utilization"));
+  auto sys_active_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/SystemActive"));
+  auto rsl_state_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/RSLState"));
+  auto sys_time_valid_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/SystemTimeValid"));
 
   auto misc_report_msg = frc_msgs::msg::MiscReport();
   misc_report_msg.stamp = this->get_clock()->now();
