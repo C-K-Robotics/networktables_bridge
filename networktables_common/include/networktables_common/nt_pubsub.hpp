@@ -260,16 +260,21 @@ public:
   {
     std::scoped_lock lock{mutex_};
     auto it = latest_msg_time_s_.find(topic_name);
-    if (it == latest_msg_time_s_.end() || !it->second) { return -1; }
-    return it->second;
+    return (it == latest_msg_time_s_.end() || !it->second) ? -1 : it->second;
   }
 
   void* last_received_msg(const std::string & topic_name) const
   {
     std::scoped_lock lock{mutex_};
     auto it = last_received_msgs_.find(topic_name);
-    if (it == last_received_msgs_.end() || !it->second) { return nullptr; }
-    return it->second.get();
+    return (it == last_received_msgs_.end() || !it->second) ? nullptr : it->second.get();
+  }
+
+  const std::unordered_map<std::string, std::shared_ptr<void>> &
+  last_received_msgs()
+  {
+    std::scoped_lock lock{mutex_};
+    return last_received_msgs_;
   }
 
 private:

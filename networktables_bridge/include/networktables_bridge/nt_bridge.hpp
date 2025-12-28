@@ -7,6 +7,7 @@
 #include <vector>
 #include <cmath>
 #include <math.h>
+#include <regex>
 
 #include "networktables_common/nt_pubsub.hpp"
 

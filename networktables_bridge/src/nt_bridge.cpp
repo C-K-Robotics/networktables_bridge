@@ -106,7 +106,7 @@ void NTBridgeNode::step_50_hz()
   auto rsl_state_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/RSLState"));
   auto sys_time_valid_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/SystemTimeValid"));
 
-  auto misc_report_msg = frc_msgs::msg::MiscReport();
+  frc_msgs::msg::MiscReport misc_report_msg;
   misc_report_msg.stamp = this->get_clock()->now();
   if (team_num_msg) misc_report_msg.team_number = static_cast<uint16_t>(*team_num_msg);
   if (bv_msg) misc_report_msg.battery_voltage = static_cast<float>(*bv_msg);
@@ -123,21 +123,35 @@ void NTBridgeNode::step_50_hz()
   if (rsl_state_msg) misc_report_msg.rsl_state = *rsl_state_msg;
   if (sys_time_valid_msg) misc_report_msg.sys_time_valid = *sys_time_valid_msg;
 
-  // TODO(Winston): must get info from NT Server (a.k.a. rio)
-  // below doesnt work since we are client only
-  // for (const auto& conn : nt::NetworkTableInstance::GetDefault().GetConnections()) {
-  //   auto client_msg = frc_msgs::msg::NTClient();
-  //   client_msg.stamp = this->get_clock()->now();
-  //   client_msg.remote_id = conn.remote_id;
-  //   auto connected_msg = static_cast<bool*>(
-  //     nt_clients_subscriber_->last_received_msg(
-  //       "/SystemStats/NTClients/" + conn.remote_id + "/Connected"));
-  //   if (connected_msg) client_msg.connected = static_cast<bool>(*connected_msg);
-  //   client_msg.ip_address = conn.remote_ip;
-  //   client_msg.protocol_version = conn.protocol_version;
-  //   client_msg.remote_port = conn.remote_port;
-  //   misc_report_msg.nt_clients.push_back(client_msg);
-  // }
+  // TODO(Winston): Confirm NTClients topic structure is stable before using this code.
+  static const std::regex re(
+    R"(^/AdvantageKit/SystemStats/NTClients/([^/]+)/Connected$)"
+  );
+
+  auto map = nt_clients_subscriber_->last_received_msgs();
+  std::smatch match;
+  for (const auto& [key, ptr] : map) {
+    if (std::regex_match(key, match, re)) continue;
+
+    std::string client_name = match[1].str();
+    frc_msgs::msg::NTClient client_msg;
+    client_msg.stamp = this->get_clock()->now();
+    client_msg.remote_id = client_name;
+
+    const std::string base = "/AdvantageKit/SystemStats/NTClients/" + client_name + "/";
+    if (ptr) client_msg.connected = *static_cast<bool*>(ptr.get());
+    if (auto it = map.find(base + "IPAddress"); it != map.end() && it->second) {
+      client_msg.ip_address = *static_cast<std::string*>(it->second.get());
+    }
+    if (auto it = map.find(base + "ProtocolVersion"); it != map.end() && it->second) {
+      client_msg.protocol_version = static_cast<uint8_t>(*static_cast<int64_t*>(it->second.get()));
+    }
+    if (auto it = map.find(base + "RemotePort"); it != map.end() && it->second) {
+      client_msg.remote_port = static_cast<uint16_t>(*static_cast<int64_t*>(it->second.get()));
+    }
+
+    misc_report_msg.nt_clients.push_back(std::move(client_msg));
+  }
 
   misc_report_pub_->publish(misc_report_msg);
 }
