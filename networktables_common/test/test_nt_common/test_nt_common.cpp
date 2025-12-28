@@ -52,6 +52,7 @@ TestNTCommonNode::TestNTCommonNode(const rclcpp::NodeOptions & options)
   pubsub::subscribe_from<DoubleTopic>(inst_, double_topic_subscriber_2_, "/data/2", pubsub::kSensorPubSubOptions);
   pubsub::subscribe_from<StringTopic, TestNTCommonNode>(
     inst_, string_topic_subscriber_, "/data/my_name", this, &TestNTCommonNode::on_string_topic_received);
+  pubsub::subscribe_from(inst_, multi_topic_subscriber_, {{"/data/array/"}});
   pubsub::publish_to<DoubleTopic>(inst_, double_topic_publisher_1_, "/data/1_copy");
   pubsub::publish_to<StringTopic>(inst_, string_topic_publisher_, "/data/my_name_copy");
   double_topic_publisher_1_->on_activate();
@@ -95,6 +96,20 @@ void TestNTCommonNode::step_20_hz()
     msg2_ros.data = *msg2;
     data_2_pub_->publish(msg2_ros);
   }
+
+  auto sp_ptr = std::static_pointer_cast<std::vector<int>>(
+    multi_topic_subscriber_->last_received_msg("/data/array/bool_array"));
+  auto sp_int_array = std::static_pointer_cast<std::vector<int64_t>>(
+    multi_topic_subscriber_->last_received_msg("/data/array/int_array"));
+  auto sp_double_array = std::static_pointer_cast<std::vector<double>>(
+    multi_topic_subscriber_->last_received_msg("/data/array/double_array"));
+  auto sp_string_array = std::static_pointer_cast<std::vector<std::string>>(
+    multi_topic_subscriber_->last_received_msg("/data/array/string_array"));
+
+  if (sp_ptr) PRINTOSS(sp_ptr);
+  if (sp_int_array) PRINTOSS(sp_int_array);
+  if (sp_double_array) PRINTOSS(sp_double_array);
+  if (sp_string_array) PRINTOSS(sp_string_array);
 }
 
 void TestNTCommonNode::step_100_hz()

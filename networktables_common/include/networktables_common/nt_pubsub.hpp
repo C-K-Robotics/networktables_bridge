@@ -263,11 +263,11 @@ public:
     return (it == latest_msg_time_s_.end() || !it->second) ? -1 : it->second;
   }
 
-  void* last_received_msg(const std::string & topic_name) const
+  std::shared_ptr<void> last_received_msg(const std::string & topic_name) const
   {
     std::scoped_lock lock{mutex_};
     auto it = last_received_msgs_.find(topic_name);
-    return (it == last_received_msgs_.end() || !it->second) ? nullptr : it->second.get();
+    return (it == last_received_msgs_.end() || !it->second) ? nullptr : it->second;
   }
 
   const std::unordered_map<std::string, std::shared_ptr<void>> &
@@ -289,27 +289,32 @@ private:
   void on_value_received(const nt::NetworkTableValue & value, const std::string & topic_name)
   {
     std::shared_ptr<void> msg;
-    // TODO(Winston): std::span does not own memory, so this may lead to dangling pointers.
     if (value.IsBooleanArray()) {
-      msg = std::make_shared<std::span<const int>>(value.GetBooleanArray());
+      auto arr = value.GetBooleanArray();
+      msg = std::make_shared<std::vector<int>>(arr.begin(), arr.end());
     } else if (value.IsBoolean()) {
       msg = std::make_shared<bool>(value.GetBoolean());
     } else if (value.IsDoubleArray()) {
-      msg = std::make_shared<std::span<const double>>(value.GetDoubleArray());
+      auto arr = value.GetDoubleArray();
+      msg = std::make_shared<std::vector<double>>(arr.begin(), arr.end());
     } else if (value.IsDouble()) {
       msg = std::make_shared<double>(value.GetDouble());
     } else if (value.IsFloatArray()) {
-      msg = std::make_shared<std::span<const float>>(value.GetFloatArray());
+      auto arr = value.GetFloatArray();
+      msg = std::make_shared<std::vector<float>>(arr.begin(), arr.end());
     } else if (value.IsFloat()) {
       msg = std::make_shared<float>(value.GetFloat());
     } else if (value.IsIntegerArray()) {
-      msg = std::make_shared<std::span<const int64_t>>(value.GetIntegerArray());
+      auto arr = value.GetIntegerArray();
+      msg = std::make_shared<std::vector<int64_t>>(arr.begin(), arr.end());
     } else if (value.IsInteger()) {
       msg = std::make_shared<int64_t>(value.GetInteger());
     } else if (value.IsRaw()) {
-      msg = std::make_shared<std::span<const uint8_t>>(value.GetRaw());
+      auto arr = value.GetRaw();
+      msg = std::make_shared<std::vector<uint8_t>>(arr.begin(), arr.end());
     } else if (value.IsStringArray()) {
-      msg = std::make_shared<std::span<const std::string>>(value.GetStringArray());
+      auto arr = value.GetStringArray();
+      msg = std::make_shared<std::vector<std::string>>(arr.begin(), arr.end());
     } else if (value.IsString()) {
       msg = std::make_shared<std::string>(value.GetString());
     } else {

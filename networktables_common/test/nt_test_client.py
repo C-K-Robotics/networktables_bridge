@@ -7,7 +7,7 @@ import os
 from os.path import basename
 import logging
 import time
-from random import random
+from random import random, randint, choice
 
 import ntcore
 
@@ -31,6 +31,10 @@ if __name__ == "__main__":
     pub1 = table.getDoubleTopic("1").publish()
     pub2 = table.getDoubleTopic("2").publish()
     name_pub = table.getStringTopic("my_name").publish()
+    bool_array_pub = table.getBooleanArrayTopic("array/bool_array").publish()
+    int_array_pub = table.getIntegerArrayTopic("array/int_array").publish()
+    double_array_pub = table.getDoubleArrayTopic("array/double_array").publish()
+    string_array_pub = table.getStringArrayTopic("array/string_array").publish()
 
     sys_table = inst.getTable("AdvantageKit/SystemStats")
     team_number_pub = sys_table.getIntegerTopic("TeamNumber").publish()
@@ -55,6 +59,11 @@ if __name__ == "__main__":
         pub1.set(i)
         pub2.set(i + 100)
         name_pub.set("Winston")
+        bool_array_pub.set([choice([True, False]), choice([True, False]), choice([True, False]), choice([True, False])])
+        int_array_pub.set([randint(0, 100), randint(0, 100), randint(0, 100), randint(0, 100), randint(0, 100)])
+        double_array_pub.set([random(), random(), random(), random(), random(), random()])
+        possible_strings = ["alpha", "bravo", "charlie", "delta", "echo"]
+        string_array_pub.set([choice(possible_strings), choice(possible_strings), choice(possible_strings)])
 
         # Example system stats
         team_number_pub.set(8020)  # Example team number

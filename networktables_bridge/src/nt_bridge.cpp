@@ -91,20 +91,20 @@ NTBridgeNode::on_shutdown(const rclcpp_lifecycle::State & state)
 
 void NTBridgeNode::step_50_hz()
 {
-  auto team_num_msg = static_cast<int64_t*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/TeamNumber"));
-  auto bv_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/BatteryVoltage"));
-  auto bc_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/BatteryCurrent"));
-  auto v3v3_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/3v3Rail/Voltage"));
-  auto c3v3_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/3v3Rail/Current"));
-  auto v5v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/5vRail/Voltage"));
-  auto c5v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/5vRail/Current"));
-  auto v6v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/6vRail/Voltage"));
-  auto c6v_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/6vRail/Current"));
-  auto cpu_temp_msg = static_cast<double*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/CPUTempCelsius"));
-  auto canbus_util_msg = static_cast<float*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/CANBus/Utilization"));
-  auto sys_active_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/SystemActive"));
-  auto rsl_state_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/RSLState"));
-  auto sys_time_valid_msg = static_cast<bool*>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/SystemTimeValid"));
+  auto team_num_msg = std::static_pointer_cast<int64_t>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/TeamNumber"));
+  auto bv_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/BatteryVoltage"));
+  auto bc_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/BatteryCurrent"));
+  auto v3v3_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/3v3Rail/Voltage"));
+  auto c3v3_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/3v3Rail/Current"));
+  auto v5v_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/5vRail/Voltage"));
+  auto c5v_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/5vRail/Current"));
+  auto v6v_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/6vRail/Voltage"));
+  auto c6v_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/6vRail/Current"));
+  auto cpu_temp_msg = std::static_pointer_cast<double>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/CPUTempCelsius"));
+  auto canbus_util_msg = std::static_pointer_cast<float>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/CANBus/Utilization"));
+  auto sys_active_msg = std::static_pointer_cast<bool>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/SystemActive"));
+  auto rsl_state_msg = std::static_pointer_cast<bool>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/RSLState"));
+  auto sys_time_valid_msg = std::static_pointer_cast<bool>(sys_stats_subscriber_->last_received_msg("/AdvantageKit/SystemStats/SystemTimeValid"));
 
   frc_msgs::msg::MiscReport misc_report_msg;
   misc_report_msg.stamp = this->get_clock()->now();

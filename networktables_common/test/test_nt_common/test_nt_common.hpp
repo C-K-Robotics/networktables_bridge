@@ -17,6 +17,18 @@
 namespace nt
 {
 
+#define PRINTOSS(sp_ptr) do {                                         \
+  const auto& sp = *(sp_ptr);                                         \
+  std::ostringstream oss;                                             \
+  oss << "size=" << sp.size() << " [";                                \
+  for (size_t i = 0; i < sp.size(); ++i) {                            \
+    if (i) oss << ", ";                                               \
+    oss << sp[i];                                                     \
+  }                                                                   \
+  oss << "]";                                                         \
+  RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());           \
+} while (0)
+
 class TestNTCommonNode : public rclcpp::Node
 {
 public:
@@ -42,6 +54,7 @@ private:
   std::unique_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_1_;
   std::shared_ptr<pubsub::TopicSubscriber<DoubleTopic>> double_topic_subscriber_2_;
   std::shared_ptr<pubsub::TopicSubscriber<StringTopic>> string_topic_subscriber_;
+  std::shared_ptr<pubsub::MultiTopicSubscriber> multi_topic_subscriber_;
   std::shared_ptr<pubsub::TopicPublisher<DoubleTopic>> double_topic_publisher_1_;
   std::shared_ptr<pubsub::TopicPublisher<StringTopic>> string_topic_publisher_;
 
