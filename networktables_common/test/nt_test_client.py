@@ -32,7 +32,7 @@ if __name__ == "__main__":
     pub2 = table.getDoubleTopic("2").publish()
     name_pub = table.getStringTopic("my_name").publish()
 
-    sys_table = inst.getTable("SystemStats")
+    sys_table = inst.getTable("AdvantageKit/SystemStats")
     team_number_pub = sys_table.getIntegerTopic("TeamNumber").publish()
     bat_voltage_pub = sys_table.getDoubleTopic("BatteryVoltage").publish()
     bat_current_pub = sys_table.getDoubleTopic("BatteryCurrent").publish()
