@@ -25,6 +25,9 @@ def generate_launch_description():
                 'nt_server_ip': LaunchConfiguration('nt_server_ip'),
             },
         ],
+        remappings=[
+            ('misc_report', 'misc_report'),
+        ],
     )
 
     return LaunchDescription(
