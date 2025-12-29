@@ -155,14 +155,6 @@ void NTBridgeNode::step_50_hz()
   misc_report_pub_->publish(misc_report_msg);
 }
 
-// void NTBridgeNode::on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg) {
-//   RCLCPP_INFO(this->get_logger(), "Yo! I received: %s", msg->c_str());
-//   const auto& name_msg = string_topic_subscriber_->last_received_msg();
-//   auto name_msg_ros = std_msgs::msg::String();
-//   name_msg_ros.data = *name_msg;
-//   my_name_pub_->publish(name_msg_ros);
-// }
-
 }  // namespace nt
 
 int main(int argc, char * argv[])

@@ -5,8 +5,6 @@
 
 #include <memory>
 #include <vector>
-#include <cmath>
-#include <math.h>
 #include <regex>
 
 #include "networktables_common/nt_pubsub.hpp"
@@ -56,7 +54,6 @@ private:
   std::shared_ptr<pubsub::MultiTopicSubscriber> nt_clients_subscriber_;
 
   void step_50_hz();
-  // void on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg);
 };
 
 }  // namespace nt
