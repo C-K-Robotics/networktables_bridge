@@ -123,7 +123,6 @@ void NTBridgeNode::step_50_hz()
   if (rsl_state_msg) misc_report_msg.rsl_state = *rsl_state_msg;
   if (sys_time_valid_msg) misc_report_msg.sys_time_valid = *sys_time_valid_msg;
 
-  // TODO(Winston): Confirm NTClients topic structure is stable before using this code.
   static const std::regex re(
     R"(^/AdvantageKit/SystemStats/NTClients/([^/]+)/Connected$)"
   );
