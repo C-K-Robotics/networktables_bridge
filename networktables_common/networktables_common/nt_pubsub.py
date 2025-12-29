@@ -115,7 +115,7 @@ class TopicSubscriber:
   def latest_msg_time(self) -> int:
     return self.__latest_msg_time
 
-  def latest_received_msg(self):
+  def last_received_msg(self):
     return self.__last_received_msg
 
 def activate_publisher(publisher: TopicPublisher):

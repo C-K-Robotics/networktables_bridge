@@ -69,21 +69,21 @@ class TestNTCommonNode(Node):
   def step_20_hz(self):
     # Publish some test data to ROS2 topics
     if self.double_topic_subscriber_1.has_msg():
-      msg1 = self.double_topic_subscriber_1.latest_received_msg()
+      msg1 = self.double_topic_subscriber_1.last_received_msg()
       msg1_ros = Float64()
       msg1_ros.data = msg1
       self.data_1_pub.publish(msg1_ros)
 
     if self.double_topic_subscriber_2.has_msg():
-      msg2 = self.double_topic_subscriber_2.latest_received_msg()
+      msg2 = self.double_topic_subscriber_2.last_received_msg()
       msg2_ros = Float64()
       msg2_ros.data = msg2
       self.data_2_pub.publish(msg2_ros)
 
   def step_100_hz(self):
-    msg1 = self.double_topic_subscriber_1.latest_received_msg()
-    msg2 = self.double_topic_subscriber_2.latest_received_msg()
-    msg3 = self.string_topic_subscriber.latest_received_msg()
+    msg1 = self.double_topic_subscriber_1.last_received_msg()
+    msg2 = self.double_topic_subscriber_2.last_received_msg()
+    msg3 = self.string_topic_subscriber.last_received_msg()
     if msg1 and msg2 and msg3:
       self.get_logger().info(
         f"Received messages (1, 2, my name): ({msg1}, {msg2}, {msg3})\n"
