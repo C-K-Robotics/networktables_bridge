@@ -1,0 +1,17 @@
+builtin_interfaces/Time stamp
+
+uint16 team_number
+float32 battery_voltage
+float32 battery_current
+float32 voltage_3v3_system
+float32 amps_3v3_system
+float32 voltage_5v_system
+float32 amps_5v_system
+float32 voltage_6v_system
+float32 amps_6v_system
+float32 rio_cpu_temp
+float32 rio_canbus_utilization
+bool sys_active
+bool rsl_state
+bool sys_time_valid
+NTClient[] nt_clients
