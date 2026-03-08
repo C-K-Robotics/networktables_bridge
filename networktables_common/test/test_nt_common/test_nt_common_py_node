@@ -90,10 +90,10 @@ class TestNTCommonNode(Node):
         f"Time Sync (ROS2 - NT): {self.get_clock().now().nanoseconds - int(nt._now()*1e3)}"
       )
 
-  def on_string_topic_received(self, msg: str):
-    self.get_logger().info(f"Yo! I received: {msg}")
+  def on_string_topic_received(self, msg):
+    self.get_logger().info(f"Yo! I received: {msg.value} at time {msg.time}")
     name_msg_ros = String()
-    name_msg_ros.data = msg
+    name_msg_ros.data = msg.value
     self.my_name_pub.publish(name_msg_ros)
       
         

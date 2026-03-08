@@ -88,15 +88,15 @@ class TopicSubscriber:
     )
 
   def __event_callback(self, event: nt.Event):
-    msg = self.__subscription.get()
+    msg = self.__subscription.getAtomic()
     self.__on_msg_received(msg)
     if self.__callback is not None:
       self.__callback(msg)
 
   def __on_msg_received(self, msg):
     self.__has_seen_msg = True
-    self.__last_received_msg = msg
-    self.__latest_msg_time = nt._now()
+    self.__last_received_msg = msg.value
+    self.__latest_msg_time = msg.time
 
   def __del__(self):
     self.__inst.removeListener(self.__value_listener_handle)

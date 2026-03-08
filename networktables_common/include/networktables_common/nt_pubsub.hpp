@@ -121,7 +121,7 @@ public:
       subscription_,
       nt::EventFlags::kValueAll,
       [this] (const nt::Event&) {
-        auto msg = std::make_shared<typename TopicT::ValueType>(subscription_.Get());
+        auto msg = std::make_shared<typename TopicT::TimestampedValueType>(subscription_.GetAtomic());
         on_msg_received(msg);
       }
     );
@@ -132,7 +132,7 @@ public:
     nt::NetworkTableInstance & inst,
     std::string const & topic_name,
     ClassT * const this_ptr,
-    void (ClassT::* callback)(const std::shared_ptr<typename TopicT::ValueType>),
+    void (ClassT::* callback)(const std::shared_ptr<typename TopicT::TimestampedValueType>),
     PubSubOptions const & options = kDefaultPubSubOptions,
     typename TopicT::ValueType const & default_msg = typename TopicT::ValueType{})
     : TopicSubscriber(inst, topic_name, options, default_msg)
@@ -142,7 +142,7 @@ public:
       subscription_,
       nt::EventFlags::kValueAll,
       [this, this_ptr, callback] (const nt::Event&) {
-        auto msg = std::make_shared<typename TopicT::ValueType>(subscription_.Get());
+        auto msg = std::make_shared<typename TopicT::TimestampedValueType>(subscription_.GetAtomic());
         on_msg_received(msg);
         (this_ptr->*callback)(msg);
       }
@@ -197,12 +197,12 @@ private:
   mutable std::mutex mutex_;  // use a mutex to make updating the value and flag thread-safe
   NT_Listener value_listener_handle_;
 
-  void on_msg_received(const std::shared_ptr<typename TopicT::ValueType> msg)
+  void on_msg_received(const std::shared_ptr<typename TopicT::TimestampedValueType> msg)
   {
     std::scoped_lock lock{mutex_};
     has_seen_msg_ = true;
-    last_received_msg_ = msg;
-    latest_msg_time_ = nt::Now();
+    last_received_msg_ = std::make_shared<typename TopicT::ValueType>(msg->value);
+    latest_msg_time_ = msg->time;
   }
 };
 
@@ -324,7 +324,7 @@ private:
 
     std::scoped_lock lock{mutex_};
     last_received_msgs_[topic_name] = msg;
-    latest_msg_time_s_[topic_name] = nt::Now();
+    latest_msg_time_s_[topic_name] = value.time();
   }
 };
 
@@ -388,7 +388,7 @@ void subscribe_from(
   typename std::shared_ptr<TopicSubscriber<TopicT>> & subscriber,
   const std::string & topic_name,
   ClassT * this_ptr,
-  void (ClassT::* callback)(const std::shared_ptr<typename TopicT::ValueType>),
+  void (ClassT::* callback)(const std::shared_ptr<typename TopicT::TimestampedValueType>),
   const PubSubOptions & options = kDefaultPubSubOptions,
   typename TopicT::ValueType const & default_msg = typename TopicT::ValueType{})
 {

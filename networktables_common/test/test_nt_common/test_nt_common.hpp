@@ -62,7 +62,7 @@ private:
   void step_100_hz();
   void on_data_1_copy_received(const std_msgs::msg::Float64::SharedPtr msg);
   void on_my_name_copy_received(const std_msgs::msg::String::SharedPtr msg);
-  void on_string_topic_received(const std::shared_ptr<StringTopic::ValueType> msg);
+  void on_string_topic_received(const std::shared_ptr<StringTopic::TimestampedValueType> msg);
 };
 
 }  // namespace nt
